@@ -20,7 +20,7 @@ async function signin(email, password) {
         alert(`Welcome back, ${data.user.email}`);
         document.getElementById("signin-form").style.display = "none";
         document.getElementById("signup-form").style.display = "none";
-        window.location.href = "http://localhost:8000/prototype.html"
+        window.location.href = "https://shamusduffey.github.io/Maptivate/prototype.html"
     }
 }
 
