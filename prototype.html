@@ -1,23 +1,90 @@
-<!DOCTYPE html>
+CTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-	<style>
-		#map {float: left; position: relative; top: 10vh; bottom: 10vh; right: 5vw; width: 55vw; height: 80vh};
-	</style>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <style>
+    /* remove the extra semicolon after the closing brace */
+    #map {
+      float: left;
+      position: relative;
+      top: 10vh;
+      bottom: 10vh;
+      right: 5vw;
+      width: 55vw;
+      height: 80vh;
+    }
+  </style>
 </head>
 <body>
-    <div id="konsole"; style="float: left; width: 40vw; height: 80vh; position: relative; top: 10vh; bottom: 10vh; left: 5vw; right: 5vw;">
-        <input type="button"; name="CreateNewLayer"; value="Create layer";>
-    </div>
-    <div id = "map"></div>
-    <script>
-    	var map = L.map('map').setView([42.63583, -71.314167], 14);
+  <div
+    id="konsole"
+    style="float:left; width:40vw; height:80vh; position:relative; top:10vh; left:5vw;"
+  >
+    <!-- give it an id so we can select it -->
+    <input type="button" id="createNewLayer" value="Create layer">
+  </div>
+  <div id="map"></div>
 
-    	L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW', {attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'}).addTo(map);
-    	var marker = L.marker([42.6431, -71.336262]).addTo(map);
-    </script>
-    
+  <!-- include Supabase JS before you use it -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- now your own script, after the DOM and supabase lib have loaded -->
+  <script>
+    const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
+    const supabaseKey = '…'; // your full key
+    const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
+
+    // grab the button by ID
+    const createNewLayer = document.getElementById('createNewLayer');
+
+    createNewLayer.addEventListener('click', async () => {
+      // first get the count
+      const { count, error: countError } = await sb
+        .from('Layers')
+        .select('*', { count: 'exact', head: true });
+
+      if (countError) {
+        console.error('Error fetching count:', countError);
+        return alert('Error fetching count: ' + countError.message);
+      }
+
+      // now insert
+      const { data, error } = await sb
+        .from('Layers')
+        .insert([{ layer_id: count, name: 'Shamus' }]);
+
+      if (error) {
+        console.error('Error inserting data:', error);
+        alert('Error inserting data: ' + error.message);
+      } else {
+        console.log('Data inserted successfully:', data);
+        alert('Data inserted successfully!');
+      }
+    });
+
+    // your Leaflet init
+    var map = L.map('map').setView([42.63583, -71.314167], 14);
+    L.tileLayer(
+      'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
+      {
+        attribution:
+          '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a>' +
+          ' <a href="https://www.openstreetmap.org/copyright" target="_blank">' +
+          '&copy; OpenStreetMap contributors</a>',
+      }
+    ).addTo(map);
+    L.marker([42.6431, -71.336262]).addTo(map);
+  </script>
 </body>
 </html>
+
+
