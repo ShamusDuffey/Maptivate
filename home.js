@@ -4,6 +4,8 @@ const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 
 createNewLayer.addEventListener('click', async() =>
 {
+	const layerName=layerNameInput.value.trim();
+	if(!layerName) return alert('Name your layer based on what it shows!');
 	const { count, error: countError } = await supabase
         .from('Layers')
         .select('*', { count: 'exact', head: true });
@@ -14,7 +16,7 @@ createNewLayer.addEventListener('click', async() =>
         	alert('Error fetching count: ' + countError.message);
         	return;
     	}
-	const {data, error} = await sb.from('Layers').insert([{layer_id: count, name: "Shamus"}]);
+	const {data, error} = await sb.from('Layers').insert([{layer_id: count, name: layerName}]);
 	if (error)
 	{
         	console.error('Error inserting data:', error);
