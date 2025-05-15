@@ -7,7 +7,7 @@ createNewLayer.addEventListener('click', async() =>
 	const layerNameInput=document.getElementById('layerNameInput');
 	const layerName=layerNameInput.value.trim();
 	if(!layerName) return alert('Name your layer based on what it shows!');
-	const { count, error: countError } = await supabase
+	const { count, error: countError } = await sb
         .from('Layers')
         .select('*', { count: 'exact', head: true });
 
