@@ -1,7 +1,7 @@
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
-
+let user_has_already_made_a_layer='f';
 createNewLayer.addEventListener('click', async() =>
 {
 	const layerNameInput=document.getElementById('layerNameInput');
@@ -27,6 +27,7 @@ createNewLayer.addEventListener('click', async() =>
 	{
         	console.log('Data inserted successfully:', data);
         	alert('Data inserted successfully!');
+		user_has_already_created_a_layer='t';
       	}
 })
 var map = L.map('map').setView([42.63583, -71.314167], 14);
@@ -39,4 +40,18 @@ L.tileLayer(
 			'&copy; OpenStreetMap contributors</a>',
 	}
 ).addTo(map);
-L.marker([42.6431, -71.336262]).addTo(map);
+map.on('click', async(e)=>
+{
+	const pin_latitude=e.latlng.lat;
+	const pin_longitude=e.latlng.lng;
+	let title=prompt("Enter the title of your pin: ");
+	let content=prompt("Add a discription for nuanced details (or don't): ");
+	if(!title) return;
+	const new_pin=L.marker([pin_latitude, pin_longitude]).addTo(map);
+	const popupContent=
+		<div>
+			<h4>${title}</h4>
+			<p>${content}</p>
+		</div>;
+	new_pin.bindPopup(popupContent).openPopup();
+}
