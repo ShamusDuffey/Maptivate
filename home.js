@@ -49,11 +49,11 @@ map.on('click', async(e)=>
 	let content=prompt("Add a discription for nuanced details (or don't): ");
 	if(!title) return;
 	const new_pin=L.marker([pin_latitude, pin_longitude]).addTo(map);
-	const popupContent=
+	const popupContent=`
 		<div>
 			<h4>${title}</h4>
 			<p>${content}</p>
-		</div>;
+		</div>;`
 	new_pin.bindPopup(popupContent).openPopup();
 }
 });
