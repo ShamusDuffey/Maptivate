@@ -15,6 +15,7 @@ async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_i
                 return;
         }
 	const {data, error} = await sb.from('Pin Posts').insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, lattitude: lat }]);
+};
 
 createNewLayer.addEventListener('click', async() =>
 {
