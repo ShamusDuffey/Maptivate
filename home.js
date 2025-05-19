@@ -3,7 +3,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 let user_has_already_made_a_layer='f';
 window.addEventListener('DOMContentLoaded',()=>{
-function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
+async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
 {
 	const { count, error: countError } = await sb
         .from('Pin Posts')
