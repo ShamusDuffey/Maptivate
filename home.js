@@ -14,7 +14,7 @@ async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_i
                 alert('Error fetching count: ' + countError.message);
                 return;
         }
-	const {data, error} = await sb.from('Pin Posts').insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, lattitude: lat }]);
+	const {data, error} = await sb.from('Pin Posts').insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
 };
 
 createNewLayer.addEventListener('click', async() =>
@@ -68,5 +68,12 @@ map.on('click', async(e)=>
 			<p>${content}</p>
 		</div>;`
 	new_pin.bindPopup(popupContent).openPopup();
+	try {
+        await saveNewPin(title, content, pin_longitude, pin_latitude);
+        alert("Pin saved successfully!");
+    	} catch (error) {
+        console.error("Failed to save pin:", error);
+        alert("Failed to save pin: " + error.message);
+}
 });
 });
