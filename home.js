@@ -2,6 +2,8 @@ const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 let user_has_already_made_a_layer='f';
+let current_layer;
+let current_layer_id;
 window.addEventListener('DOMContentLoaded',()=>{
 async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
 {
@@ -15,6 +17,7 @@ async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_i
                 return;
         }
 	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
+	return count;
 };
 
 createNewLayer.addEventListener('click', async() =>
@@ -42,6 +45,8 @@ createNewLayer.addEventListener('click', async() =>
         	console.log('Data inserted successfully:', data);
         	alert('Data inserted successfully!');
 		user_has_already_created_a_layer='t';
+		current_layer=layerName;
+		current_layer_id=count;
       	}
 });
 var map = L.map('map').setView([42.63583, -71.314167], 14);
@@ -66,14 +71,15 @@ map.on('click', async(e)=>
 		<div>
 			<h4>${title}</h4>
 			<p>${content}</p>
-		</div>;`
+		</div>`;
 	new_pin.bindPopup(popupContent).openPopup();
 	try {
-        await saveNewPin(title, content, pin_longitude, pin_latitude);
+        let pinId=await saveNewPin(title, content, pin_longitude, pin_latitude);
         alert("Pin saved successfully!");
     	} catch (error) {
         console.error("Failed to save pin:", error);
         alert("Failed to save pin: " + error.message);
+	await sb.from(`Layers_Pins_Relation`).insert([{pin_id: pinId, layer_id: current_layer_id}]);
 }
 });
 });
