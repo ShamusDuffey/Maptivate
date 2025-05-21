@@ -79,7 +79,8 @@ map.on('click', async(e)=>
     	} catch (error) {
         console.error("Failed to save pin:", error);
         alert("Failed to save pin: " + error.message);
+	}
 	await sb.from(`Layers_Pins_Relation`).insert([{pin_id: pinId, layer_id: current_layer_id}]);
-}
+
 });
 });
