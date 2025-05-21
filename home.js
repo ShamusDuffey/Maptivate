@@ -73,8 +73,8 @@ map.on('click', async(e)=>
 			<p>${content}</p>
 		</div>`;
 	new_pin.bindPopup(popupContent).openPopup();
+	let pinId=await saveNewPin(title, content, pin_longitude, pin_latitude);
 	try {
-        let pinId=await saveNewPin(title, content, pin_longitude, pin_latitude);
         alert("Pin saved successfully!");
     	} catch (error) {
         console.error("Failed to save pin:", error);
