@@ -26,7 +26,8 @@
   </style>
 </head>
 <body>
-  <div id="konsole" style="float:left; width:40vw; height:80vh; position:relative; top:10vh; left:5vw;">
+  <div id="konsole" style="float:left; width:40vw; height:80vh; position:relative; top:10vh; left:5vw; border: 4px solid red;">
+
     <input type="button" id="createNewLayer" value="Create layer">
     <input type="text" id="layerNameInput" placeholder="Name the layer based on what it shows.">
   </div>
@@ -35,6 +36,11 @@
     <input type="button" value="SEARCH" id="searchButton">
     <input type="search" placeholder="What data do you want to see mapped?" id="searchBar">
   </div>
+  <ul>
+    <li><label><input type="checkbox">LAYER 1</label><li>
+    <li><label><input type="checkbox">LAYER 2</label><li>
+    <li><label><input type="checkbox">LAYER 3</label><li>
+    <li><label><input type="checkbox">LAYER 4</label><li>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="home.js"></script>
 </body>
