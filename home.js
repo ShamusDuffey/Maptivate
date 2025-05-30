@@ -44,8 +44,8 @@ createNewLayer.addEventListener('click', async() =>
 	{
         	console.log('Data inserted successfully:', data);
         	alert('Data inserted successfully!');
-		user_has_already_created_a_layer='t';
-		current_layer_ids.push(count);
+		user_has_already_made_a_layer='t';
+		working_layer_ids.push(count);
       	}
 });
 var map = L.map('map').setView([42.63583, -71.314167], 14);
@@ -99,11 +99,12 @@ map.on('click', async(e)=>
 searchBar.addEventListener('input', async()=>
 {
 	const {data, error}=await sb.from("layers").select("name");
+	const allLayerNames;
 	if(error){console.error(error); return;}
-	else{const allLayerNames=data.map(row=>row.name);}
+	else{allLayerNames=data.map(row=>row.name);}
 	const query=searchBar.value.toLowerCase();
 	resultsList.innerHTML='';
-	const searchResults=allLayerNames.filter(result=>result.toLowerCase.includes(query));
+	const searchResults=allLayerNames.filter(result=>result.toLowerCase().includes(query));
 	for(let i=0; (i<8)&&(i<searchResults.length); i++)
 	{
 		let result=searchResults[i];
@@ -112,4 +113,5 @@ searchBar.addEventListener('input', async()=>
 		resultsList.appendChild(LI);
 	}
 		
+});
 });
