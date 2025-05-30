@@ -96,4 +96,20 @@ map.on('click', async(e)=>
 	}
 
 });
+searchBar.addEventListener('input', async()=>
+{
+	const {data, error}=await sb.from("layers").select("name");
+	if(error){console.error(error); return;}
+	else{const allLayerNames=data.map(row=>row.name);}
+	const query=searchBar.value.toLowerCase();
+	resultsList.innerHTML='';
+	const searchResults=allLayerNames.filter(result=>result.toLowerCase.includes(query));
+	for(let i=0; (i<8)&&(i<searchResults.length); i++)
+	{
+		let result=searchResults[i];
+		const LI=document.createElement('li');
+		LI.textContent=result;
+		resultsList.appendChild(LI);
+	}
+		
 });
