@@ -99,7 +99,7 @@ map.on('click', async(e)=>
 searchBar.addEventListener('input', async()=>
 {
 	const {data, error}=await sb.from("Layers").select("name");
-	const allLayerNames=[];
+	let allLayerNames=[];
 
 	if(error){console.error(error); return;}
 	else{allLayerNames=data.map(row=>row.name);}
