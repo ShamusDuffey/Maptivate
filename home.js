@@ -103,7 +103,7 @@ searchBar.addEventListener('input', async()=>
 
 	if(error){console.error(error); return;}
 	else{allLayerNames=data.map(row=>row.name);}
-	const query=searchBar.value.toLowerCase();
+	let query=searchBar.value.toLowerCase();
 	resultsList.innerHTML='';
 	const searchResults=allLayerNames.filter(result=>result.toLowerCase().includes(query));
 	for(let i=0; (i<8)&&(i<searchResults.length); i++)
@@ -112,7 +112,26 @@ searchBar.addEventListener('input', async()=>
 		const LI=document.createElement('li');
 		LI.textContent=result;
 		resultsList.appendChild(LI);
+		LI.addEventListener('click', async()=>
+		{query=result;}
 	}
 		
 });
+layer1Box.addEventListener('click', async()=>
+{
+	selected_layer_ids.push(working_layer_ids[0]);
+});
+layer2Box.addEventListener('click', async()=>
+{
+        selected_layer_ids.push(working_layer_ids[1]);
+});
+layer3Box.addEventListener('click', async()=>
+{
+        selected_layer_ids.push(working_layer_ids[2]);
+});
+layer4Box.addEventListener('click', async()=>
+{
+        selected_layer_ids.push(working_layer_ids[3]);
+});
+
 });
