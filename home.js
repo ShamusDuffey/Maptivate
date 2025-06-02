@@ -113,7 +113,7 @@ searchBar.addEventListener('input', async()=>
 		LI.textContent=result;
 		resultsList.appendChild(LI);
 		LI.addEventListener('click', async()=>
-		{query=result;}
+		{query=result;});
 	}
 		
 });
