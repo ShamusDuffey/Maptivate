@@ -23,7 +23,7 @@ async function getLayerIdOrName(argument)
 {
 	if(typeof argument==="string")
 	{
-		const{data, error}=await sb.from(`Layers`).select("id").eq("name", argument).single();
+		const{data, error}=await sb.from(`Layers`).select("layer_id").eq("name", argument).single();
 		if (error)
 		{
    		 	console.error('Error querying Supabase: ', error);
@@ -139,7 +139,12 @@ searchBar.addEventListener('input', async()=>
 		LI.addEventListener('click', async()=>
 		{
 			searchBar.placeholder=result;
-			selected_layer_ids[Number(layerSwapDropdown.value)]=getLayerIdOrName(result);
+			selected_layer_ids.push(getLayerIdOrName(result));
+			working_layer_ids[Number(layerSwapDropdown.value)]=getLayerIdOrName(result);
+			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.textContent=result;
+			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.textContent=result; 
+			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.textContent=result; 
+			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.textContent=result; 
 		});
 	}
 		
