@@ -19,7 +19,31 @@ async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_i
 	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
 	return count;
 };
-
+async function getLayerIdOrName(argument)
+{
+	if(typeof argument==="string")
+	{
+		const{data, error}=await sb.from(`Layers`).select("id").eq("name", argument).single();
+		if (error)
+		{
+   		 	console.error('Error querying Supabase: ', error);
+			alert('Error fetching id: ' + error.message);
+    			return null;
+  		}
+		return data.layer_id;
+	}
+	if(typeof argument==="number")
+	{
+		const{data, error}=await sb.from(`Layers`).select("name").eq("layer_id", argument).single();
+		if(error)
+		{
+			console.error('Error querying Supabase: ', error);
+			alert('Error fetching name: ' + error.message);
+			return null;
+		}
+		return data.name;
+	}
+};
 createNewLayer.addEventListener('click', async() =>
 {
 	const layerNameInput=document.getElementById('layerNameInput');
@@ -108,29 +132,39 @@ searchBar.addEventListener('input', async()=>
 	const searchResults=allLayerNames.filter(result=>result.toLowerCase().includes(query));
 	for(let i=0; (i<8)&&(i<searchResults.length); i++)
 	{
-		let result=searchResults[i];
+		const result=searchResults[i];
 		const LI=document.createElement('li');
 		LI.textContent=result;
 		resultsList.appendChild(LI);
 		LI.addEventListener('click', async()=>
-		{query=result;});
+		{
+			searchBar.placeholder=result;
+			selected_layer_ids[Number(layerSwapDropdown.value)]=getLayerIdOrName(result);
+		});
 	}
 		
 });
 layer1Box.addEventListener('click', async()=>
 {
+	if(selected_layer_ids.contains(working_layer_ids[0]))
+		return;
 	selected_layer_ids.push(working_layer_ids[0]);
 });
 layer2Box.addEventListener('click', async()=>
 {
+	if(selected_layer_ids.contains(working_layer_ids[1]))
+		return;
         selected_layer_ids.push(working_layer_ids[1]);
 });
 layer3Box.addEventListener('click', async()=>
 {
+	if(selected_layer_ids.contains(working_layer_ids[2]))
+		return;
         selected_layer_ids.push(working_layer_ids[2]);
 });
 layer4Box.addEventListener('click', async()=>
 {
+	if(selected_layer_ids.contains(working_layer_ids[3]))
         selected_layer_ids.push(working_layer_ids[3]);
 });
 
