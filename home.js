@@ -4,7 +4,7 @@ const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 let user_has_already_made_a_layer='f';
 let working_layer_ids=[];
 let selected_layer_ids=[];
-let 
+
 window.addEventListener('DOMContentLoaded',()=>{
 async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
 {
