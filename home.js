@@ -4,6 +4,7 @@ const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 let user_has_already_made_a_layer='f';
 let working_layer_ids=[];
 let selected_layer_ids=[];
+let 
 window.addEventListener('DOMContentLoaded',()=>{
 async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
 {
@@ -41,7 +42,7 @@ async function getLayerIdOrName(argument)
 			alert('Error fetching name: ' + error.message);
 			return null;
 		}
-		return data.name;
+		return data.name;//this line may be causing an error
 	}
 };
 createNewLayer.addEventListener('click', async() =>
@@ -141,10 +142,10 @@ searchBar.addEventListener('input', async()=>
 			searchBar.placeholder=result;
 			selected_layer_ids.push(getLayerIdOrName(result));
 			working_layer_ids[Number(layerSwapDropdown.value)]=getLayerIdOrName(result);
-			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.textContent=result;
-			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.textContent=result; 
-			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.textContent=result; 
-			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.textContent=result; 
+			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
+			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
+			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
+			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.childNodes[1].nodeValue=result;
 		});
 	}
 		
