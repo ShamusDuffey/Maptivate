@@ -8,9 +8,7 @@ let
 window.addEventListener('DOMContentLoaded',()=>{
 async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
 {
-	const { count, error: countError } = await sb
-        .from('Pin Posts')
-        .select('*', { count: 'exact', head: true });
+	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
         if (countError)
         {
                 console.error('Error fetching count:', countError);
@@ -33,7 +31,7 @@ async function getLayerIdOrName(argument)
   		}
 		return data.layer_id;
 	}
-	if(typeof argument==="number")
+	else if(typeof argument==="number")
 	{
 		const{data, error}=await sb.from(`Layers`).select("name").eq("layer_id", argument).single();
 		if(error)
@@ -43,6 +41,11 @@ async function getLayerIdOrName(argument)
 			return null;
 		}
 		return data.name;//this line may be causing an error
+	}
+	else
+	{
+		console.log("Invalid type in getLayerIdOrName\n");
+		return;
 	}
 };
 createNewLayer.addEventListener('click', async() =>
@@ -141,7 +144,7 @@ searchBar.addEventListener('input', async()=>
 		{
 			searchBar.placeholder=result;
 			selected_layer_ids.push(getLayerIdOrName(result));
-			working_layer_ids[Number(layerSwapDropdown.value)]=getLayerIdOrName(result);
+			working_layer_ids[Number(layerSwapDropdown.value)]=await getLayerIdOrName(result);
 			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
 			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
 			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
@@ -152,25 +155,26 @@ searchBar.addEventListener('input', async()=>
 });
 layer1Box.addEventListener('click', async()=>
 {
-	if(selected_layer_ids.contains(working_layer_ids[0]))
+	if(selected_layer_ids.includes(working_layer_ids[0]))
 		return;
 	selected_layer_ids.push(working_layer_ids[0]);
 });
 layer2Box.addEventListener('click', async()=>
 {
-	if(selected_layer_ids.contains(working_layer_ids[1]))
+	if(selected_layer_ids.includes(working_layer_ids[1]))
 		return;
         selected_layer_ids.push(working_layer_ids[1]);
 });
 layer3Box.addEventListener('click', async()=>
 {
-	if(selected_layer_ids.contains(working_layer_ids[2]))
+	if(selected_layer_ids.includes(working_layer_ids[2]))
 		return;
         selected_layer_ids.push(working_layer_ids[2]);
 });
 layer4Box.addEventListener('click', async()=>
 {
-	if(selected_layer_ids.contains(working_layer_ids[3]))
+	if(selected_layer_ids.includes(working_layer_ids[3]))
+		return;
         selected_layer_ids.push(working_layer_ids[3]);
 });
 
