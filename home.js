@@ -73,10 +73,10 @@ async function loadPin(pin_id, ...credentials)
 		return;
 	}
 	const popupContent=
-		"<div>
+		`<div>
 			<h4>${title}</h4>
 			<p>${content}</p>
-		</div>";
+		</div>`;
 	L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
 	return row;
 }
