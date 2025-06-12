@@ -26,12 +26,13 @@ async function getPinsOfLayer(layer)
                 let pinRows=[];
                 for(const id of idsOfPins)
                 {
-                        pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single());
-                }
-		if (error)
-		{
-    			console.error(`Error fetching pin ${id}:`, error);
-    			continue;
+                        const {data: returnedPin, error: returnError}=sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+			pinRows.push(returnedPin);
+			if(returnError)
+			{
+				console.error("Error fetching pin ${id}: ", returnError);
+				continue;
+			}
                 }
 		return pinRows;
         }
