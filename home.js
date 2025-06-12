@@ -15,7 +15,7 @@ async function getPinsOfLayer(layer)
 		let pinRows=[];
 		for(let id of idsOfPins)
 		{
-			pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+			pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single());
 		}
 		return pinRows;
 	}
