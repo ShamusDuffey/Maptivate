@@ -2,11 +2,85 @@ const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 let user_has_already_made_a_layer='f';
-let working_layer_ids=[];
-let selected_layer_ids=[];
-
+let working_layer_ids=[null, null, null, null];
+let selected_layer_ids=[null, null, null, null];
+let downloadedPins=[[null], [null], [null], [null]];
 window.addEventListener('DOMContentLoaded',()=>{
-async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_id later
+async function getPinsOfLayer(layer)
+{
+	if(typeof layer==="string")
+	{
+		const {data, error}=sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", getLayerIdOrName(layer));
+		const idsOfPins=data.map(relationRow=>relationRow.pin_id);
+		let pinRows=[];
+		for(let id of idsOfPins)
+		{
+			pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+		}
+		return pinRows;
+	}
+	else if(typeof layer==="number")
+        {
+                const {data, error}=sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", layer);
+                const idsOfPins=data.map(relationRow=>relationRow.pin_id);
+                let pinRows=[];
+                for(const id of idsOfPins)
+                {
+                        pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single());
+                }
+		if (error)
+		{
+    			console.error(`Error fetching pin ${id}:`, error);
+    			continue;
+                }
+		return pinRows;
+        }
+	else
+		console.error("getPinsOfLayer is being called with an inappropriate type.\n");
+}
+async function loadLayer(layer)
+{
+	if(typeof layer==="string")
+		layer=getLayerIdOrName(layer);
+	const allPins=getPinsOfLayer(layer);
+	for(const row of allPins)
+	{
+		loadPin(row.pin_id, row.latitude, row.longitude, row.title, row.content);
+	}
+} 
+	
+async function loadPin(pin_id, ...credentials)
+{
+	if(credentials.length===0&&typeof pin_id==="number")
+	{
+		const row=sb.from('Pin Posts'.select('*').eq('pin_id', pin_id).single();
+		const lat=row.latitude;
+		const lng=row.longitude;
+		const title=row.title;
+		const content=row.content;
+	}
+	else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
+	{
+		const lat=credentials[0];
+		const lng=credentials[1];
+		const title=credentials[2];
+		const content=credentials[3];
+	}
+	else
+	{
+		console.error("Incorrectly formatted arguments in loadPin function\n");
+		return;
+	}
+	const popupContent=
+		"<div>
+			<h4>${title}</h4>
+			<p>${content}</p>
+		</div>";
+	L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+	return row;
+}
+	
+async function saveNewPin(newTitle, newContent, lat, lng, ...selectedLayerIds)//have to add creator_id later
 {
 	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
         if (countError)
@@ -16,6 +90,17 @@ async function saveNewPin(newTitle, newContent, lng, lat)//have to add creator_i
                 return;
         }
 	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
+	for(let id of selectedLayerIds)
+	{
+		if(id===null)
+			continue;
+		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: id}]);
+		if(relationError)
+		{
+			console.error("Error inserting into the relation table for pins and layers\n");
+			return;
+		}
+	}
 	return count;
 };
 async function getLayerIdOrName(argument)
@@ -48,6 +133,25 @@ async function getLayerIdOrName(argument)
 		return;
 	}
 };
+async function clearMap()
+{
+	for(const layer of downloadedPins)
+	{
+		for(const pin of layer)
+		{
+			map.removeLayer(pin);
+		}
+	}
+}
+async function reloadMap()
+{
+	clearMap();
+	for(const layer of downloadedPins)
+	{
+		loadLayer(layer);
+	}
+} 
+
 createNewLayer.addEventListener('click', async() =>
 {
 	const layerNameInput=document.getElementById('layerNameInput');
@@ -100,29 +204,17 @@ map.on('click', async(e)=>
 			<p>${content}</p>
 		</div>`;
 	new_pin.bindPopup(popupContent).openPopup();
-	let pinId;
 	try
 	{
-        	pinId=await saveNewPin(title, content, pin_longitude, pin_latitude);
+        	await saveNewPin(title, content, pin_longitude, pin_latitude, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selcted_layer_ids[3]);
 		alert("Pin saved successfully!");
+		reloadMap();
     	}
 	catch (error)
 	{
         	console.error("Failed to save pin:", error);
         	alert("Failed to save pin: " + error.message);
 	}
-	let insertError;
-	//loop start
-	for(let i=0; i<selected_layer_ids.length; i++)
-	{
-		({error: insertError}=await sb.from(`Layers_Pins_Relation`).insert([{pin_id: pinId, layer_id: selected_layer_ids[i]}]));
-		if(insertError)
-		{
-			alert("There was a problem inserting into the Layers-Pins relation database table." + insertError.message);
-			return;
-		}
-	}
-
 });
 searchBar.addEventListener('input', async()=>
 {
@@ -156,26 +248,47 @@ searchBar.addEventListener('input', async()=>
 layer1Box.addEventListener('click', async()=>
 {
 	if(selected_layer_ids.includes(working_layer_ids[0]))
-		return;
-	selected_layer_ids.push(working_layer_ids[0]);
+	{
+		selected_layer_ids[0]=null;
+	}
+	else
+	{
+		selected_layer_ids.push(working_layer_ids[0]);
+	}
+	reloadMap();
 });
 layer2Box.addEventListener('click', async()=>
 {
 	if(selected_layer_ids.includes(working_layer_ids[1]))
-		return;
-        selected_layer_ids.push(working_layer_ids[1]);
+	{
+		selected_layer_ids[1]=null;
+	}
+	else
+	{
+        	selected_layer_ids.push(working_layer_ids[1]);
+	}
+	reloadMap();
 });
 layer3Box.addEventListener('click', async()=>
 {
 	if(selected_layer_ids.includes(working_layer_ids[2]))
-		return;
-        selected_layer_ids.push(working_layer_ids[2]);
+	{
+		selected_layer_ids[2]=null;
+	}
+        else
+	{
+		selected_layer_ids.push(working_layer_ids[2]);
+	}
+	reloadMap();
 });
 layer4Box.addEventListener('click', async()=>
 {
 	if(selected_layer_ids.includes(working_layer_ids[3]))
-		return;
+	{
+		selected_layer_ids[3]=null;
+	}
         selected_layer_ids.push(working_layer_ids[3]);
+	reloadMap();
 });
 
 });
