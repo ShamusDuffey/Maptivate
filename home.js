@@ -6,45 +6,31 @@ let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
 window.addEventListener('DOMContentLoaded',()=>{
-async function getPinsOfLayer(layer)
+async function downloadLayer(layer, workingIndex)
 {
-	if(typeof layer==="string")
-	{
-		const {data, error}=sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", getLayerIdOrName(layer));
-		const idsOfPins=data.map(relationRow=>relationRow.pin_id);
-		let pinRows=[];
-		for(let id of idsOfPins)
-		{
-			pinRows.push(sb.from('Pin Posts').select('*').eq("pin_id", id).single());
-		}
-		return pinRows;
-	}
-	else if(typeof layer==="number")
+	if(typeof layer==="number")
         {
                 const {data, error}=sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", layer);
                 const idsOfPins=data.map(relationRow=>relationRow.pin_id);
-                let pinRows=[];
+		downloadedPins[workingIndex]=[];
                 for(const id of idsOfPins)
                 {
                         const {data: returnedPin, error: returnError}=sb.from('Pin Posts').select('*').eq("pin_id", id).single();
-			pinRows.push(returnedPin);
 			if(returnError)
 			{
 				console.error("Error fetching pin ${id}: ", returnError);
 				continue;
 			}
+			downloadedPins[workingIndex].push(returnedPin);
                 }
-		return pinRows;
+		return;
         }
 	else
-		console.error("getPinsOfLayer is being called with an inappropriate type.\n");
+		console.error("downloadLayer is being called with an inappropriate type.\n");
 }
-async function loadLayer(layer)
+async function loadLayer(workingIndex)
 {
-	if(typeof layer==="string")
-		layer=getLayerIdOrName(layer);
-	const allPins=getPinsOfLayer(layer);
-	for(const row of allPins)
+	for(const row of downloadedLayers[workingIndex])
 	{
 		loadPin(row.pin_id, row.latitude, row.longitude, row.title, row.content);
 	}
@@ -54,7 +40,7 @@ async function loadPin(pin_id, ...credentials)
 {
 	if(credentials.length===0&&typeof pin_id==="number")
 	{
-		const row=sb.from('Pin Posts'.select('*').eq('pin_id', pin_id).single());
+		const row=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single());
 		const lat=row.latitude;
 		const lng=row.longitude;
 		const title=row.title;
@@ -138,6 +124,8 @@ async function clearMap()
 {
 	for(const layer of downloadedPins)
 	{
+		if(layer===null)
+			continue;
 		for(const pin of layer)
 		{
 			map.removeLayer(pin);
@@ -147,9 +135,9 @@ async function clearMap()
 async function reloadMap()
 {
 	clearMap();
-	for(const layer of downloadedPins)
+	for(let i=0; i<downloadedPins.length; i++)
 	{
-		loadLayer(layer);
+		loadLayer(i);
 	}
 } 
 
@@ -236,8 +224,10 @@ searchBar.addEventListener('input', async()=>
 		LI.addEventListener('click', async()=>
 		{
 			searchBar.placeholder=result;
-			selected_layer_ids.push(getLayerIdOrName(result));
-			working_layer_ids[Number(layerSwapDropdown.value)]=await getLayerIdOrName(result);
+			let id=await getLayerIdOrName(result);
+			selected_layer_ids[Number(layerSwapDropdown.value)]=id;
+			working_layer_ids[Number(layerSwapDropdown.value)]=id;
+			downloadLayer(id, Number(layerSwapDropdown.value));
 			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
 			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
 			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
@@ -254,7 +244,7 @@ layer1Box.addEventListener('click', async()=>
 	}
 	else
 	{
-		selected_layer_ids.push(working_layer_ids[0]);
+		selected_layer_ids[0]=working_layer_ids[0];
 	}
 	reloadMap();
 });
@@ -266,7 +256,7 @@ layer2Box.addEventListener('click', async()=>
 	}
 	else
 	{
-        	selected_layer_ids.push(working_layer_ids[1]);
+        	selected_layer_ids[1]=working_layer_ids[1];
 	}
 	reloadMap();
 });
@@ -278,7 +268,7 @@ layer3Box.addEventListener('click', async()=>
 	}
         else
 	{
-		selected_layer_ids.push(working_layer_ids[2]);
+		selected_layer_ids[2]=working_layer_ids[2];
 	}
 	reloadMap();
 });
@@ -288,7 +278,7 @@ layer4Box.addEventListener('click', async()=>
 	{
 		selected_layer_ids[3]=null;
 	}
-        selected_layer_ids.push(working_layer_ids[3]);
+        selected_layer_ids[3]=working_layer_ids[3];
 	reloadMap();
 });
 
