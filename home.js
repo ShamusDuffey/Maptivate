@@ -40,7 +40,7 @@ async function loadPin(pin_id, ...credentials)
 {
 	if(credentials.length===0&&typeof pin_id==="number")
 	{
-		const row=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single());
+		const row=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
 		const lat=row.latitude;
 		const lng=row.longitude;
 		const title=row.title;
