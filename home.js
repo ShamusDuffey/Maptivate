@@ -10,7 +10,7 @@ async function downloadLayer(layer, workingIndex)
 {
 	if(typeof layer==="number")
         {
-                const {data, error}=await sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", layer);
+                const {data, error}=sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", layer);
                 const idsOfPins=data.map(relationRow=>relationRow.pin_id);
 		downloadedPins[workingIndex]=[];
                 for(const id of idsOfPins)
@@ -30,7 +30,7 @@ async function downloadLayer(layer, workingIndex)
 }
 async function loadLayer(workingIndex)
 {
-	for(const row of downloadedLayers[workingIndex])
+	for(const row of downloadedPins[workingIndex])
 	{
 		loadPin(row.pin_id, row.latitude, row.longitude, row.title, row.content);
 	}
