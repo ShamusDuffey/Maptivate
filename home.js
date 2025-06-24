@@ -15,7 +15,7 @@ async function downloadLayer(layer, workingIndex)
 		downloadedPins[workingIndex]=[];
                 for(const id of idsOfPins)
                 {
-                        const {data: returnedRow, error: returnError}=sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+                        const {data: returnedRow, error: returnError}=await sb.from('Pin Posts').select('*').eq("pin_id", id).single();
 			if(returnError)
 			{
 				console.error("Error fetching pin ${id}: ", returnError);
