@@ -34,7 +34,7 @@ async function loadLayer(workingIndex)
 {
 	for(const row of downloadedPins[workingIndex])
 	{
-		row.lMarker.addTo(map);
+		row.lMarker.addTo(map).bimdPopup(row.sRow.content);
 	}
 } 
 	
@@ -135,7 +135,8 @@ async function clearMap()
 			continue;
 		for(const row of layer)
 		{
-			map.removeLayer(row.lMarker);
+			if(row.lMarker===null) continue; //might remove this in correspondance with the below comment 6/24 12:35
+			map.removeLayer(row.lMarker);//not sure if every lMarker is being assigned to the row structure 6/24 12:33
 		}
 	}
 }
