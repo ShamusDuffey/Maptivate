@@ -93,7 +93,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, ...selectedLay
 	}
 	for(let i of selectedLayerIndices)
 	{
-		downloadedPins[i].push({sRow: sRow, lMarker: marker);
+		downloadedPins[i].push({sRow: sRow, lMarker: marker});
 	}
 	return count;
 };
