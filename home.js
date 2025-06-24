@@ -18,7 +18,7 @@ async function downloadLayer(layer, workingIndex)
                         const {data: returnedRow, error: returnError}=await sb.from('Pin Posts').select('*').eq("pin_id", id).single();
 			if(returnError)
 			{
-				console.error("Error fetching pin ${id}: ", returnError);
+				console.error(`Error fetching pin ${id}: `, returnError);
 				continue;
 			}
 			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
@@ -34,10 +34,18 @@ async function loadLayer(workingIndex)
 {
 	for(const row of downloadedPins[workingIndex])
 	{
+		if(row===null) continue; //again why are there null rows in downloadedPins? 6/24 12:48
 		row.lMarker.addTo(map).bindPopup(row.sRow.content);
 	}
 } 
-	
+async function hideLayer(workingIndex)
+{
+	for(const row of downloadedPins[workingIndex])
+	{
+		if(row===null) continue;
+		map.removeLayer(row.lMarker)
+	}
+}
 async function loadPin(pin_id, ...credentials)
 {
 	if(credentials.length===0&&typeof pin_id==="number")
@@ -145,7 +153,8 @@ async function reloadMap()
 	clearMap();
 	for(let i=0; i<downloadedPins.length; i++)
 	{
-		loadLayer(i);
+		if(selected_layer_ids[i])
+			loadLayer(i);
 	}
 } 
 
@@ -285,7 +294,10 @@ layer4Box.addEventListener('click', async()=>
 	{
 		selected_layer_ids[3]=null;
 	}
-        selected_layer_ids[3]=working_layer_ids[3];
+	else
+	{
+		selected_layer_ids[3]=working_layer_ids[3];
+	}
 	reloadMap();
 });
 
