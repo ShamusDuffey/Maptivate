@@ -241,7 +241,6 @@ searchBar.addEventListener('input', async()=>
 		{
 			searchBar.placeholder=result;
 			let id=await getLayerIdOrName(result);
-			selected_layer_ids[Number(layerSwapDropdown.value)]=id;
 			working_layer_ids[Number(layerSwapDropdown.value)]=id;
 			downloadLayer(id, Number(layerSwapDropdown.value));
 			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
