@@ -15,13 +15,14 @@ async function downloadLayer(layer, workingIndex)
 		downloadedPins[workingIndex]=[];
                 for(const id of idsOfPins)
                 {
-                        const {data: returnedPin, error: returnError}=sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+                        const {data: returnedRow, error: returnError}=sb.from('Pin Posts').select('*').eq("pin_id", id).single();
 			if(returnError)
 			{
 				console.error("Error fetching pin ${id}: ", returnError);
 				continue;
 			}
-			downloadedPins[workingIndex].push(returnedPin);
+			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
+			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin});
 			console.log("Downloaded pin ${id}\n");
                 }
 		return;
@@ -33,7 +34,7 @@ async function loadLayer(workingIndex)
 {
 	for(const row of downloadedPins[workingIndex])
 	{
-		loadPin(row.pin_id, row.latitude, row.longitude, row.title, row.content);
+		row.lMarker.addTo(map);
 	}
 } 
 	
@@ -41,11 +42,11 @@ async function loadPin(pin_id, ...credentials)
 {
 	if(credentials.length===0&&typeof pin_id==="number")
 	{
-		const row=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
-		const lat=row.latitude;
-		const lng=row.longitude;
-		const title=row.title;
-		const content=row.content;
+		const sRow=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
+		const lat=sRow.latitude;
+		const lng=sRow.longitude;
+		const title=sRow.title;
+		const content=sRow.content;
 	}
 	else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
 	{
@@ -64,11 +65,11 @@ async function loadPin(pin_id, ...credentials)
 			<h4>${title}</h4>
 			<p>${content}</p>
 		</div>`;
-	L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
-	return row;
+	let pin=L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+	return pin;
 }
 	
-async function saveNewPin(newTitle, newContent, lat, lng, ...selectedLayerIds)//have to add creator_id later
+async function saveNewPin(newTitle, newContent, lat, lng, marker, ...selectedLayerIndices)//have to add creator_id later//and the marker argument
 {
 	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
         if (countError)
@@ -78,16 +79,21 @@ async function saveNewPin(newTitle, newContent, lat, lng, ...selectedLayerIds)//
                 return;
         }
 	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
-	for(let id of selectedLayerIds)
+	let sRow=data;
+	for(let index of selectedLayerIndices)
 	{
-		if(id===null)
+		if(selectedLayerIds[index]===null)
 			continue;
-		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: id}]);
+		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selectedLayerIds[index]}]);
 		if(relationError)
 		{
 			console.error("Error inserting into the relation table for pins and layers\n");
 			return;
 		}
+	}
+	for(let i of selectedLayerIndices)
+	{
+		downloadedPins[i].push({sRow: sRow, lMarker: marker);
 	}
 	return count;
 };
@@ -127,9 +133,9 @@ async function clearMap()
 	{
 		if(layer===null)
 			continue;
-		for(const pin of layer)
+		for(const row of layer)
 		{
-			map.removeLayer(pin);
+			map.removeLayer(row.lMarker);
 		}
 	}
 }
@@ -187,16 +193,15 @@ map.on('click', async(e)=>
 	let title=prompt("Enter the title of your pin: ");
 	let content=prompt("Add a discription for nuanced details (or don't): ");
 	if(!title) return;
-	const new_pin=L.marker([pin_latitude, pin_longitude]).addTo(map);
+	const new_pin=L.marker([pin_latitude, pin_longitude]);
 	const popupContent=`
 		<div>
 			<h4>${title}</h4>
 			<p>${content}</p>
 		</div>`;
-	new_pin.bindPopup(popupContent).openPopup();
 	try
 	{
-        	await saveNewPin(title, content, pin_longitude, pin_latitude, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selcted_layer_ids[3]);
+        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selcted_layer_ids[3]);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
