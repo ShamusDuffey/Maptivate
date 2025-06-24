@@ -135,7 +135,7 @@ async function clearMap()
 			continue;
 		for(const row of layer)
 		{
-			if(row.lMarker===null) continue; //might remove this in correspondance with the below comment 6/24 12:35
+			if(row===null) continue; //might remove this in correspondance with the below comment 6/24 12:35
 			map.removeLayer(row.lMarker);//not sure if every lMarker is being assigned to the row structure 6/24 12:33
 		}
 	}
