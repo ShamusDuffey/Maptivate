@@ -34,7 +34,7 @@ async function loadLayer(workingIndex)
 {
 	for(const row of downloadedPins[workingIndex])
 	{
-		row.lMarker.addTo(map).bimdPopup(row.sRow.content);
+		row.lMarker.addTo(map).bindPopup(row.sRow.content);
 	}
 } 
 	
