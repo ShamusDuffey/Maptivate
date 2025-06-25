@@ -77,7 +77,7 @@ async function loadPin(pin_id, ...credentials)
 	return pin;
 }
 	
-async function saveNewPin(newTitle, newContent, lat, lng, marker, ...selectedLayerIndices)//have to add creator_id later//and the marker argument
+async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerIndices)//have to add creator_id later//and the marker argument
 {
 	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
         if (countError)
@@ -90,8 +90,6 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, ...selectedLay
 	let sRow=data;
 	for(let index of selectedLayerIndices)
 	{
-		if(selected_layer_ids[index]===null)
-			continue;
 		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selected_layer_ids[index]}]);
 		if(relationError)
 		{
@@ -209,9 +207,15 @@ map.on('click', async(e)=>
 			<h4>${title}</h4>
 			<p>${content}</p>
 		</div>`;
+	let sliIndices=[];
+	for(let i=0; i<selected_layer_ids.length; i++)
+	{
+		if(selected_layer_ids[i])
+		sliIndicies.push(i);
+	}
 	try
 	{
-        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selected_layer_ids[3]);
+        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, sliIndices);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
