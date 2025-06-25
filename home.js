@@ -211,7 +211,7 @@ map.on('click', async(e)=>
 		</div>`;
 	try
 	{
-        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selcted_layer_ids[3]);
+        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, selected_layer_ids[0], selected_layer_ids[1], selected_layer_ids[2], selected_layer_ids[3]);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
@@ -242,7 +242,7 @@ searchBar.addEventListener('input', async()=>
 			searchBar.placeholder=result;
 			let id=await getLayerIdOrName(result);
 			working_layer_ids[Number(layerSwapDropdown.value)]=id;
-			downloadLayer(id, Number(layerSwapDropdown.value));
+			await downloadLayer(id, Number(layerSwapDropdown.value));
 			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
 			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
 			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
