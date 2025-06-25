@@ -90,9 +90,9 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, ...selectedLay
 	let sRow=data;
 	for(let index of selectedLayerIndices)
 	{
-		if(selectedLayerIds[index]===null)
+		if(selected_layer_ids[index]===null)
 			continue;
-		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selectedLayerIds[index]}]);
+		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selected_layer_ids[index]}]);
 		if(relationError)
 		{
 			console.error("Error inserting into the relation table for pins and layers\n");
