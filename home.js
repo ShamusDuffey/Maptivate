@@ -211,7 +211,7 @@ map.on('click', async(e)=>
 	for(let i=0; i<selected_layer_ids.length; i++)
 	{
 		if(selected_layer_ids[i])
-		sliIndicies.push(i);
+		sliIndices.push(i);
 	}
 	try
 	{
