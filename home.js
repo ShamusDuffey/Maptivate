@@ -87,6 +87,11 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerI
                 return;
         }
 	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
+	if(error)
+	{
+		console.error("There was an issue inserting a pin into the database: "+error.message);
+		return;
+	}
 	let sRow=data;
 	for(let index of selectedLayerIndices)
 	{
