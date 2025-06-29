@@ -23,7 +23,7 @@ async function downloadLayer(layer, workingIndex)
 			}
 			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
 			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin});
-			console.log("Downloaded pin "+id+"\n with this sRow content: "+returnedRow);
+			console.log("Downloaded pin "+id+"\n with this sRow content: "+JSON.stringify(returnedRow, null 4));
                 }
 		return;
         }
