@@ -215,7 +215,7 @@ map.on('click', async(e)=>
 	}
 	try
 	{
-        	await saveNewPin(title, content, pin_longitude, pin_latitude, new_pin, sliIndices);
+        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, sliIndices);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
