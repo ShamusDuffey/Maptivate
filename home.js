@@ -23,7 +23,7 @@ async function downloadLayer(layer, workingIndex)
 			}
 			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
 			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin});
-			console.log("Downloaded pin ${id}\n");
+			console.log("Downloaded pin "+id+"\n with this sRow content: "+returnedRow);
                 }
 		return;
         }
@@ -207,11 +207,6 @@ map.on('click', async(e)=>
 	let content=prompt("Add a discription for nuanced details (or don't): ");
 	if(!title) return;
 	const new_pin=L.marker([pin_latitude, pin_longitude]);
-	const popupContent=`
-		<div>
-			<h4>${title}</h4>
-			<p>${content}</p>
-		</div>`;
 	let sliIndices=[];
 	for(let i=0; i<selected_layer_ids.length; i++)
 	{
