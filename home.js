@@ -18,12 +18,12 @@ async function downloadLayer(layer, workingIndex)
                         const {data: returnedRow, error: returnError}=await sb.from('Pin Posts').select('*').eq("pin_id", id).single();
 			if(returnError)
 			{
-				console.error(`Error fetching pin ${id}: `, returnError);
+				console.error("Error fetching pin "+id+":", returnError);
 				continue;
 			}
 			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
 			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin});
-			console.log("Downloaded pin "+id+"\n with this sRow content: "+JSON.stringify(returnedRow, null 4));
+			console.log("Downloaded pin "+id+"\n with this sRow content: "+JSON.stringify(returnedRow, null, 4));
                 }
 		return;
         }
