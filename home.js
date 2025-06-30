@@ -213,6 +213,7 @@ map.on('click', async(e)=>
 		if(selected_layer_ids[i])
 		sliIndices.push(i);
 	}
+	console.log("sliIndices: "); console.log(sliIndices);//
 	try
 	{
         	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, sliIndices);
