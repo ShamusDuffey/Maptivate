@@ -156,7 +156,7 @@ async function reloadMap()
 	clearMap();
 	for(let i=0; i<downloadedPins.length; i++)
 	{
-		if(selected_layer_ids[i])
+		if(selected_layer_ids[i]!=null)
 			loadLayer(i);
 	}
 } 
@@ -210,7 +210,7 @@ map.on('click', async(e)=>
 	let sliIndices=[];
 	for(let i=0; i<selected_layer_ids.length; i++)
 	{
-		if(selected_layer_ids[i])
+		if(selected_layer_ids[i]!=null)
 		sliIndices.push(i);
 	}
 	console.log("sliIndices: "); console.log(sliIndices);//
