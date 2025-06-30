@@ -35,7 +35,13 @@ async function loadLayer(workingIndex)
 	for(const row of downloadedPins[workingIndex])
 	{
 		if(row===null) continue; //again why are there null rows in downloadedPins? 6/24 12:48
-		row.lMarker.addTo(map).bindPopup(row.sRow.content);
+		const popupContent=
+                `<div>
+                        <h4>${row.sRow.title}</h4>
+                        <p>${row.sRow.content}</p>
+                </div>`;
+
+		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 } 
 async function hideLayer(workingIndex)
