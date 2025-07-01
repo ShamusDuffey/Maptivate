@@ -111,6 +111,11 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerI
 	for(let i of selectedLayerIndices)
 	{
 		downloadedPins[i].push({sRow: sRow, lMarker: marker});
+		console.log("Pushed row with sRow information:");
+		console.log(sRow);
+		console.log("and marker information:");
+		console.log(marker);
+		console.log("to downloadedPins at index "+i);
 	}
 	return count;
 };
