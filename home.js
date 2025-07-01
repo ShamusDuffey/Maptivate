@@ -92,7 +92,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerI
                 alert('Error fetching count: ' + countError.message);
                 return;
         }
-	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]);
+	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]).select();
 	if(error)
 	{
 		console.error("There was an issue inserting a pin into the database: "+error.message);
