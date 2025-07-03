@@ -23,7 +23,7 @@ async function signUp(email, password, phone)
 	const {data: phoneExists, error: pExistenceError}=await sb.from('Users').select("Phone Number").eq('Phone Number', phone).maybeSingle();
 	if(pExistenceError)
 	{
-		console.error("Failed to check if the email exists");
+		console.error("Failed to check if the email exists"+pExistenceError.message);
 		return 0;
 	}
 	if(phoneExists)
