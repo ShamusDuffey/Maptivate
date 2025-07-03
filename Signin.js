@@ -41,7 +41,9 @@ async function signUp(email, password, phone)
 	if(phoneError)
 	{
 		alert("There was an issue with your phone number while signing you up: "+phoneError.message);
-		const {data: deletionResult, sb.from('Users').delete().eq('email', email);
+		const {data: deletionResult, error: deletionError}=await sb.from('Users').delete().eq('email', email);
+		if(deletionError)
+			console.error("An account has been made but an unfixed error occurred. The account must be manually deleted. Here's the error: "+error.message);
 		return 0;
 	}
        	alert("Welcome! You've been signed up! Just confirm your identity via email and text to gain access to your account.");
