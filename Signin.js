@@ -4,6 +4,16 @@ const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 
 async function signUp(email, password, phone) {
     const { data, error } = await sb.auth.signUp({ email: email, password: password, options: { data: {phone: phone} } });
+
+    const userId = data.user.id;
+    const { error: insertError } = await sb
+        .from('users')  // Match actual table name
+        .insert([{ id: userId, phone }]); // Manually insert phone # from metadata
+
+    if (insertError) {
+        console.error("Database insert failed:", insertError); // Manual insert failed
+    }
+    
     console.log("Signup Response:", data, error); // Log the response for debugging
     if (error) {
         alert("There was an issue signing you up: " + error.message);
