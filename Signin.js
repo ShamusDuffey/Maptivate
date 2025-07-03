@@ -59,12 +59,12 @@ async function signin(email, password)
 	else
 	{
 		alert(`Welcome back, ${data.user.email}`);
-		document.getElementById("signin-form").style.display = "none";
-		document.getElementById("signup-form").style.display = "none";
+		document.getElementById("signinForm").style.display = "none";
+		document.getElementById("signupForm").style.display = "none";
 		window.location.href="https://shamusduffey.github.io/Maptivate/prototype.html"
 	}
 }
-document.getElementById("signup-form").addEventListener("submit", async (e) =>
+document.getElementById("signupForm").addEventListener("submit", async (e) =>
 {
 	e.preventDefault();
 	const email = document.getElementById("signupEmail").value;
@@ -74,7 +74,7 @@ document.getElementById("signup-form").addEventListener("submit", async (e) =>
 		alert("You're going to have to sign up successfully in order to post, but you can view the world's most nuanced map for now.");
 	window.location.href="https://shamusduffey.github.io/Maptivate/prototype.html";
 });
-document.getElementById("signin-form").addEventListener("submit", async (e) =>
+document.getElementById("signinForm").addEventListener("submit", async (e) =>
 {
 	e.preventDefault();
 	const email = document.getElementById("email").value;
