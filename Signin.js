@@ -37,7 +37,7 @@ async function signUp(email, password, phone)
 		alert("There was an issue signing you up with your email: " + error.message);
 		return 0;
 	}
-	const {data: phoneData, error: phoneError}=await sb.auth.signUp({phone: phone});
+	const {data: phoneData, error: phoneError}=await sb.auth.signUp({phone: phone, password: password});
 	if(phoneError)
 	{
 		alert("There was an issue with your phone number while signing you up: "+phoneError.message);
