@@ -46,6 +46,12 @@ async function signUp(email, password, phone)
 			console.error("An account has been made but an unfixed error occurred. The account must be manually deleted. Here's the error: "+error.message);
 		return 0;
 	}*/
+	const {error: userTableFillError}=await sb.from("Users").update({phone_number: phone}).eq("email", email);
+	if(userTableFillError)
+	{
+		console.error("The phone number could not be updated. Here's why: "+userTableFillError.message);
+		return;
+	}
        	alert("Welcome! You've been signed up! Just confirm your identity via email and text to gain access to your account.");
 	return 1;
 }
