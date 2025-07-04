@@ -12,7 +12,7 @@ async function signUp(email, password, phone)
 	const {data: emailExists, error: eExistenceError}=await sb.from('Users').select('email').eq('email', email).maybeSingle();
 	if(eExistenceError)
 	{
-		console.error("Failed to check if the email exists");
+		console.error("Failed to check if the email exists: "+eExistenceError.message);
 		return 0;
 	}
 	if(emailExists)
@@ -23,7 +23,7 @@ async function signUp(email, password, phone)
 	const {data: phoneExists, error: pExistenceError}=await sb.from('Users').select("phone_number").eq("phone_number", phone).maybeSingle();
 	if(pExistenceError)
 	{
-		console.error("Failed to check if the email exists"+pExistenceError.message);
+		console.error("Failed to check if the phone number exists: "+pExistenceError.message);
 		return 0;
 	}
 	if(phoneExists)
@@ -37,7 +37,7 @@ async function signUp(email, password, phone)
 		alert("There was an issue signing you up with your email: " + error.message);
 		return 0;
 	}
-	const {data: phoneData, error: phoneError}=await sb.auth.signUp({phone: phone, password: password});
+	/*const {data: phoneData, error: phoneError}=await sb.auth.signUp({phone: phone, password: password});
 	if(phoneError)
 	{
 		alert("There was an issue with your phone number while signing you up: "+phoneError.message);
@@ -45,7 +45,7 @@ async function signUp(email, password, phone)
 		if(deletionError)
 			console.error("An account has been made but an unfixed error occurred. The account must be manually deleted. Here's the error: "+error.message);
 		return 0;
-	}
+	}*/
        	alert("Welcome! You've been signed up! Just confirm your identity via email and text to gain access to your account.");
 	return 1;
 }
