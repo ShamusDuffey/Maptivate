@@ -20,7 +20,7 @@ async function signUp(email, password, phone)
 		alert("There's already an accout with this email; no additional accounts were made.");
 		return 0;
 	}
-	const {data: phoneExists, error: pExistenceError}=await sb.from('Users').select("Phone Number").eq('Phone Number', phone).maybeSingle();
+	const {data: phoneExists, error: pExistenceError}=await sb.from('Users').select("Phone Number").eq("Phone Number", phone).maybeSingle();
 	if(pExistenceError)
 	{
 		console.error("Failed to check if the email exists"+pExistenceError.message);
