@@ -261,14 +261,18 @@ searchBar.addEventListener('input', async()=>
 			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
 			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
 			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.childNodes[1].nodeValue=result;
-			reloadMap();
 		});
 	}
 		
 });
 layer1Box.addEventListener('click', async()=>
 {
-	if(selected_layer_ids.includes(working_layer_ids[0]))
+	if(working_layer_ids[0]===null)
+	{
+		alert("Search for a layer first.");
+		return;
+	}
+	else if(selected_layer_ids.includes(working_layer_ids[0]))
 	{
 		selected_layer_ids[0]=null;
 	}
