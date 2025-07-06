@@ -1,7 +1,6 @@
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
-let user_has_already_made_a_layer='f';
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
@@ -196,7 +195,6 @@ createNewLayer.addEventListener('click', async() =>
 	{
         	console.log('Data inserted successfully:', data);
         	alert('Data inserted successfully!');
-		user_has_already_made_a_layer='t';
 		working_layer_ids.push(count);
       	}
 });
@@ -263,6 +261,7 @@ searchBar.addEventListener('input', async()=>
 			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
 			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
 			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.childNodes[1].nodeValue=result;
+			reloadMap();
 		});
 	}
 		
