@@ -270,6 +270,7 @@ layer1Box.addEventListener('click', async()=>
 	if(working_layer_ids[0]===null)
 	{
 		alert("Search for a layer first.");
+		document.getElementById("layer1Box").checked=false;
 		return;
 	}
 	else if(selected_layer_ids.includes(working_layer_ids[0]))
