@@ -285,6 +285,13 @@ layer1Box.addEventListener('click', async()=>
 });
 layer2Box.addEventListener('click', async()=>
 {
+	if(working_layer_ids[1]===null)
+        {
+                alert("Search for a layer first.");
+                document.getElementById("layer2Box").checked=false;
+                return;
+        }
+
 	if(selected_layer_ids.includes(working_layer_ids[1]))
 	{
 		selected_layer_ids[1]=null;
@@ -297,6 +304,13 @@ layer2Box.addEventListener('click', async()=>
 });
 layer3Box.addEventListener('click', async()=>
 {
+	if(working_layer_ids[2]===null)
+        {
+                alert("Search for a layer first.");
+                document.getElementById("layer3Box").checked=false;
+                return;
+        }
+
 	if(selected_layer_ids.includes(working_layer_ids[2]))
 	{
 		selected_layer_ids[2]=null;
@@ -309,6 +323,12 @@ layer3Box.addEventListener('click', async()=>
 });
 layer4Box.addEventListener('click', async()=>
 {
+	if(working_layer_ids[3]===null)
+        {
+                alert("Search for a layer first.");
+                document.getElementById("layer4Box").checked=false;
+                return;
+        }
 	if(selected_layer_ids.includes(working_layer_ids[3]))
 	{
 		selected_layer_ids[3]=null;
