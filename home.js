@@ -255,12 +255,13 @@ searchBar.addEventListener('input', async()=>
 		{
 			searchBar.placeholder=result;
 			let id=await getLayerIdOrName(result);
+			if(working_layer_ids.includes(id)) {alert("You may not pick the same layer for multiple slots."); return;}
+			if(Number(layerSwapDropdown.value)==0) {document.getElementById("layer1Box").checked=false; hideLayer(0); layer1Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==1) {document.getElementById("layer2Box").checked=false; hideLayer(1); layer2Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==2) {document.getElementById("layer3Box").checked=false; hideLayer(2); layer3Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==3) {document.getElementById("layer4Box").checked=false; hideLayer(3); layer4Box.parentElement.childNodes[1].nodeValue=result;}
 			working_layer_ids[Number(layerSwapDropdown.value)]=id;
 			await downloadLayer(id, Number(layerSwapDropdown.value));
-			if(Number(layerSwapDropdown.value)==0) layer1Box.parentElement.childNodes[1].nodeValue=result;
-			if(Number(layerSwapDropdown.value)==1) layer2Box.parentElement.childNodes[1].nodeValue=result; 
-			if(Number(layerSwapDropdown.value)==2) layer3Box.parentElement.childNodes[1].nodeValue=result;
-			if(Number(layerSwapDropdown.value)==3) layer4Box.parentElement.childNodes[1].nodeValue=result;
 		});
 	}
 		
