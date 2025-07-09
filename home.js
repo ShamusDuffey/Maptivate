@@ -1,6 +1,8 @@
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
+const {data: {session}, error: sessionError}=await sb.auth.getSession();
+if(sessionError) console.log(sessionError.message);
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
@@ -91,7 +93,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerI
                 alert('Error fetching count: ' + countError.message);
                 return;
         }
-	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat }]).select().single();
+	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: session.user.user_id }]).select().single();
 	if(error)
 	{
 		console.error("There was an issue inserting a pin into the database: "+error.message);
@@ -173,6 +175,7 @@ async function reloadMap()
 
 createNewLayer.addEventListener('click', async() =>
 {
+	if(!session){alert("You must be signed in to create layers and pins."); return;}
 	const layerNameInput=document.getElementById('layerNameInput');
 	const layerName=layerNameInput.value.trim();
 	if(!layerName) return alert('Name your layer based on what it shows!');
@@ -185,7 +188,7 @@ createNewLayer.addEventListener('click', async() =>
         	alert('Error fetching count: ' + countError.message);
         	return;
     	}
-	const {data, error} = await sb.from('Layers').insert([{layer_id: count, name: layerName}]);
+	const {data, error} = await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: session.user.user_id});
 	if (error)
 	{
         	console.error('Error inserting data:', error);
@@ -197,6 +200,8 @@ createNewLayer.addEventListener('click', async() =>
         	alert('Data inserted successfully!');
 		working_layer_ids.push(count);
       	}
+	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: session.user.user_id});
+	if(relationError) console.error(relationError.message);
 });
 var map = L.map('map').setView([42.63583, -71.314167], 14);
 L.tileLayer(
@@ -210,6 +215,7 @@ L.tileLayer(
 ).addTo(map);
 map.on('click', async(e)=>
 {
+	if(!session){alert("You must be signed in to create layers and pins."); return;}
 	const pin_latitude=e.latlng.lat;
 	const pin_longitude=e.latlng.lng;
 	let title=prompt("Enter the title of your pin: ");
@@ -225,7 +231,7 @@ map.on('click', async(e)=>
 	console.log("sliIndices: "); console.log(sliIndices);//
 	try
 	{
-        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, sliIndices);
+        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, session.user.user_id, sliIndices);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
