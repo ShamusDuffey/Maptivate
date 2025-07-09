@@ -8,7 +8,6 @@ async function checkSession()
 	else return data.session;
 }
 const session=checkSession();
-if(sessionError) console.log(sessionError.message);
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
