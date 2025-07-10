@@ -8,6 +8,13 @@ async function checkSession()
 	else return data.session;
 }
 const session=checkSession();
+async function getUser()
+{
+	const{data, error}=await sb.from("Users").select("*").eq("email", session.Email).single();
+	if(error) console.error(error.message);
+	else return data;
+}
+const USER=getUser();
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
@@ -98,7 +105,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerI
                 alert('Error fetching count: ' + countError.message);
                 return;
         }
-	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: session.user.user_id }]).select().single();
+	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: USER.user_id }]).select().single();
 	if(error)
 	{
 		console.error("There was an issue inserting a pin into the database: "+error.message);
@@ -193,7 +200,7 @@ createNewLayer.addEventListener('click', async() =>
         	alert('Error fetching count: ' + countError.message);
         	return;
     	}
-	const {data, error} = await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: session.user.user_id});
+	const {data, error} = await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: USER.user_id});
 	if (error)
 	{
         	console.error('Error inserting data:', error);
@@ -205,7 +212,7 @@ createNewLayer.addEventListener('click', async() =>
         	alert('Data inserted successfully!');
 		working_layer_ids.push(count);
       	}
-	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: session.user.user_id});
+	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: USER.user_id});
 	if(relationError) console.error(relationError.message);
 });
 var map = L.map('map').setView([42.63583, -71.314167], 14);
@@ -236,7 +243,7 @@ map.on('click', async(e)=>
 	console.log("sliIndices: "); console.log(sliIndices);//
 	try
 	{
-        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, session.user.user_id, sliIndices);
+        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, USER.user_id, sliIndices);
 		alert("Pin saved successfully!");
 		reloadMap();
     	}
