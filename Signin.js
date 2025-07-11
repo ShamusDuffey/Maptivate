@@ -67,7 +67,11 @@ async function signin(email, password)
 		alert(`Welcome back, ${data.user.email}`);
 		document.getElementById("signinForm").style.display = "none";
 		document.getElementById("signupForm").style.display = "none";
-		window.location.href="https://shamusduffey.github.io/Maptivate/prototype.html"
+		const {data: session}=await sb.auth.getSession(); 
+		if(session) 
+			window.location.href="https://shamusduffey.gitbub.io/Maptivate/prototype.html"; 
+		else
+			console.error("No user signed in on this client.");
 	}
 }
 document.getElementById("signupForm").addEventListener("submit", async (e) =>
@@ -78,7 +82,9 @@ document.getElementById("signupForm").addEventListener("submit", async (e) =>
 	const phone = document.getElementById("signupPhone").value;
 	if(!await signUp(email, password, phone))
 		alert("You're going to have to sign up successfully in order to post, but you can view the world's most nuanced map for now.");
-	window.location.href="https://shamusduffey.gitbub.io/Maptivate/prototype.html";
+	const {data: session}=await sb.auth.getSession();
+	if(session)
+		window.location.href="https://shamusduffey.gitbub.io/Maptivate/prototype.html";
 });
 document.getElementById("signinForm").addEventListener("submit", async (e) =>
 {
