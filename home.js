@@ -96,7 +96,7 @@ async function loadPin(pin_id, ...credentials)
 	return pin;
 }
 	
-async function saveNewPin(newTitle, newContent, lat, lng, marker, selectedLayerIndices)//have to add creator_id later//and the marker argument
+async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, selectedLayerIndices)
 {
 	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
         if (countError)
