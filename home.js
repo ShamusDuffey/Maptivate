@@ -7,14 +7,14 @@ async function checkSession()
 	if(error) console.error(error.message);
 	else return data.session;
 }
-const session=checkSession();
+const session=await checkSession();
 async function getUser()
 {
 	const{data, error}=await sb.from("Users").select("*").eq("email", session.Email).single();
 	if(error) console.error(error.message);
 	else return data;
 }
-const USER=getUser();
+const USER=await getUser();
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
