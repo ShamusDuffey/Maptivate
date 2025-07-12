@@ -19,7 +19,7 @@ async function getUser()
 {
 	session=await checkSession();
 	USER=await getUser();
-}
+})();
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
