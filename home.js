@@ -1,5 +1,7 @@
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
+const session;
+const USER;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 async function checkSession()
 {
@@ -7,12 +9,16 @@ async function checkSession()
 	if(error) console.error(error.message);
 	else return data.session;
 }
-const session=await checkSession();
 async function getUser()
 {
 	const{data, error}=await sb.from("Users").select("*").eq("email", session.Email).single();
 	if(error) console.error(error.message);
 	else return data;
+}
+(async () =>
+{
+	session=await checkSession();
+	USER=await getUser();
 }
 const USER=await getUser();
 let working_layer_ids=[null, null, null, null];
