@@ -11,7 +11,7 @@ async function checkSession()
 }
 async function getUser()
 {
-	const{data, error}=await sb.from("Users").select("*").eq("email", session.Email).single();
+	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();
 	if(error) console.error(error.message);
 	else return data;
 }
