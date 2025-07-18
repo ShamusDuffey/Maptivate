@@ -91,7 +91,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) =>
 	const email = document.getElementById("signupEmail").value;
 	const password = document.getElementById("signupPassword").value;
 	const phone = document.getElementById("signupPhone").value;
-	const displayName=document.getElementById("signupDisplayName");
+	const displayName=document.getElementById("signupDisplayName").value;
 	if(!await signUp(email, password, phone, displayName))
 		alert("You're going to have to sign up successfully in order to post, but you can view the world's most nuanced map for now.");
 	const {data: session}=await sb.auth.getSession();
