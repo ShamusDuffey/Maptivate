@@ -2,7 +2,7 @@ const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 
-async function signUp(email, password, phone)
+async function signUp(email, password, phone, displayName)
 {
 	if(!email||!password||!phone)
 	{
@@ -31,6 +31,17 @@ async function signUp(email, password, phone)
 		alert("There's already an account with this phone number; no additional accounts were made.");
 		return 0;
 	}
+	const {data: displayNameExists, error: dExistenceError}=await sb.from('Users').select('display_name').eq('display_name', displayName).maybeSingle();
+	if(dExistenceError)
+	{
+		console.error("Failed to check if the display name exists: "+dExistenceError.message);
+		return 0;
+	}
+	if(displayNameExists)
+	{
+		alert("There's already an account with this display name; no additional accounts were made.");
+		return 0;
+	}
 	const {data: emailData, error: emailError}=await sb.auth.signUp({email: email, password: password, options: {data: {phone: phone}}});
 	if (emailError)
 	{
@@ -46,7 +57,7 @@ async function signUp(email, password, phone)
 			console.error("An account has been made but an unfixed error occurred. The account must be manually deleted. Here's the error: "+error.message);
 		return 0;
 	}*/
-	const {error: userTableFillError}=await sb.from("Users").insert({email: email, password: password, phone_number: phone});
+	const {error: userTableFillError}=await sb.from("Users").insert({user_id: emailData.user.id, email: email, password: password, phone_number: phone, display_name: displayName});
 	if(userTableFillError)
 	{
 		console.error("The phone number could not be updated. Here's why: "+userTableFillError.message);

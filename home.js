@@ -53,10 +53,51 @@ async function loadLayer(workingIndex)
 	for(const row of downloadedPins[workingIndex])
 	{
 		if(row===null) continue; //again why are there null rows in downloadedPins? 6/24 12:48
+		switch(workingIndex)
+		{
+			case 0: let pinColor="red"; 
+			if(selected_layer_ids[1]&&selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="black";
+			else if(selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="brown";
+			else if(selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="#ffb77d";//light orange
+			else if(selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="#d132d1";//light purple
+			else if(selected_layer_ids[1]) pinColor="purple";
+			else if(selected_layer_ids[2]) pinColor="orange";
+			else if(selected_layer_ids[3]) pinColor="pink";
+			break;
+			case 1: let pinColor="blue";
+			if(selected_layer_ids[0]&&selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="black";
+			else if(selected_layer_ids[0]&&selected_layer_ids[2]) pinColor="brown";
+			else if(selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="#96ff96";//light green
+			else if(selected_layer_ids[0]&&selected_layer_ids[3]) pinColor="#d132d1";//light purple
+			else if(selected_layer_ids[0]) pinColor="purple";
+			else if(selected_layer_ids[2]) pinColor="green";
+			else if(selected_layer_ids[3]) pinColor="#8787ff";//light blue
+			break;
+			case 2: let pinColor="yellow";
+			if(selected_layer_ids[0]&&selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="black";
+			else if(selected_layer_ids[0]&&selected_layer_ids[1]) pinColor="brown";
+			else if(selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="#96ff96";//light green
+			else if(selected_layer_ids[0]&&selected_layer_ids[3]) pinColor="#ffb77d";//light orange
+			else if(selected_layer_ids[0]) pinColor="orange";
+			else if(selected_layer_ids[1]) pinColor="green";
+			else if(selected_layer_ids[3]) pinColor="#d132d1";//light yellow
+			break;
+			case 3: let pinColor="white";
+			if(selected_layer_ids[0]&&selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="black";
+			else if(selected_layer_ids[0]&&selected_layer_ids[1]) pinColor="#d132d1";//light purple
+			else if(selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="#96ff96";//light green
+			else if(selected_layer_ids[0]&&selected_layer_ids[2]) pinColor="#ffb77d";//light orange
+			else if(selected_layer_ids[0]) pinColor="pink";
+			else if(selected_layer_ids[1]) pinColor="#8787ff";//light blue
+			else if(selected_layer_ids[2]) pinColor="#d132d1";//light yellow
+			break;
+			default: let pinColor="undefined color"; return;
+		}
 		const popupContent=
                 `<div>
                         <h4>${row.sRow.title}</h4>
                         <p>${row.sRow.content}</p>
+			<p style="color: ${pinColor}">By user: ${USER.display_name}</p>
                 </div>`;
 
 		row.lMarker.addTo(map).bindPopup(popupContent);
@@ -215,7 +256,6 @@ createNewLayer.addEventListener('click', async() =>
 	{
         	console.log('Data inserted successfully:', data);
         	alert('Data inserted successfully!');
-		working_layer_ids.push(count);
       	}
 	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: USER.user_id});
 	if(relationError) console.error(relationError.message);
