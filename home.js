@@ -404,5 +404,11 @@ layer4Box.addEventListener('click', async()=>
 	}
 	reloadMap();
 });
-
+signoutButton.addEventListener('click', async()=>
+{
+	if(session)
+	const {error}=sb.auth.signOut();
+	if(error)
+		console.error(error.message);
+});
 });
