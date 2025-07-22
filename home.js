@@ -94,11 +94,15 @@ async function loadLayer(workingIndex)
 			break;
 			default: pinColor="undefined color"; return;
 		}
+		const {data, error}=await sb.from("Users").select("display_name").eq("user_id", row.sRow.creator_id).single();
+		if(error)
+			console.error(error.message)
+		
 		const popupContent=
                 `<div>
                         <h4>${row.sRow.title}</h4>
                         <p>${row.sRow.content}</p>
-			<p style="color: ${pinColor}">By user: ${USER.display_name}</p>
+			<p style="color: ${pinColor}">By user: <a href="https://maptivate.earth/users"><u>${data.display_name}</u></a></p>
                 </div>`;
 
 		row.lMarker.addTo(map).bindPopup(popupContent);
@@ -408,9 +412,11 @@ signoutButton.addEventListener('click', async()=>
 {
 	if(session)
 	{
-		const {error}=sb.auth.signOut();
+		const {error}=await sb.auth.signOut();
 		if(error)
 			console.error(error.message);
+		else
+			window.location.href="https://Maptivate.earth/index.html";
 	}
 });
 });
