@@ -80,7 +80,7 @@ async function signin(email, password)
 		document.getElementById("signupForm").style.display = "none";
 		const {data: session}=await sb.auth.getSession(); 
 		if(session) 
-			window.location.href="https://Maptivate.earth/prototype.html"; 
+			window.location.href="https://shamusduffey.github.io/Maptivate/GITprototype.html"; 
 		else
 			console.error("No user signed in on this client.");
 	}
@@ -96,7 +96,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) =>
 		alert("You're going to have to sign up successfully in order to post, but you can view the world's most nuanced map for now.");
 	const {data: session}=await sb.auth.getSession();
 	if(session)
-		window.location.href="https://Maptivate.earth/prototype.html";
+		window.location.href="https://Maptivate.earth/GITprototype.html";
 });
 document.getElementById("signinForm").addEventListener("submit", async (e) =>
 {

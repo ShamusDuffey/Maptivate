@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+	<link
+		rel="stylesheet"
+		href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+		crossorigin=""
+	/>
+	<script
+		src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+	 	integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+	 	crossorigin=""
+		></script>
+		<style>
+		#map {
+		position: relative;
+		top: 10vh;
+		bottom: 10vh;
+		right: 5vw;
+		width: 55vw;
+		height: 80vh;}
+	</style>
+	<h3 id="usernameHeader"></h3>
+</head>
+<body>
+	<p id="postNumberParagraph">Number of posts:</p>
+	<br>
+	<p id="activeCommunities">Active in the following communities:</p>
+	<div id="map" style="border-radius: 32px; border: 4px solid blue; float: right;"></div>
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</body>

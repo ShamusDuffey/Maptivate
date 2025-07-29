@@ -3,13 +3,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 let session;
 let USER;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
-async function checkSession()
+export async function checkSession()
 {
 	const{data, error}=await sb.auth.getSession();
 	if(error) console.error(error.message);
 	else return data.session;
 }
-async function getUser()
+export async function getUser()
 {
 	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();
 	if(error) console.error(error.message);
@@ -102,7 +102,7 @@ async function loadLayer(workingIndex)
                 `<div>
                         <h4>${row.sRow.title}</h4>
                         <p>${row.sRow.content}</p>
-			<p style="color: ${pinColor}">By user: <a href="https://maptivate.earth/users"><u>${data.display_name}</u></a></p>
+			<p style="color: ${pinColor}">By user: <a href="https://shamusduffey.github.io/Maptivate/users"><u>${data.display_name}</u></a></p>
                 </div>`;
 
 		row.lMarker.addTo(map).bindPopup(popupContent);
@@ -116,7 +116,7 @@ async function hideLayer(workingIndex)
 		map.removeLayer(row.lMarker)
 	}
 }
-async function loadPin(pin_id, ...credentials)
+export async function loadPin(pin_id, ...credentials)
 {
 	if(credentials.length===0&&typeof pin_id==="number")
 	{
@@ -240,11 +240,20 @@ createNewLayer.addEventListener('click', async() =>
 {
 	if(!session){alert("You must be signed in to create layers and pins."); return;}
 	const layerNameInput=document.getElementById('layerNameInput');
-	const layerName=layerNameInput.value.trim();
+	const layerName=layerNameInput.value.trim().toLowerCase();
+	const {data: layerExists, error: existenceError}=await sb.from('Layers').select('name').eq('name', layerName).maybeSingle();
+	if(existenceError)
+	{
+		console.error(existenceError.message);
+		return;
+	}
+	if(layerExists)
+	{
+		alert("This layer already exists; no new layer was created.");
+		return;
+	}
 	if(!layerName) return alert('Name your layer based on what it shows!');
-	const { count, error: countError } = await sb
-        .from('Layers')
-        .select('*', { count: 'exact', head: true });
+	const{count, error: countError}=await sb.from('Layers').select('*', {count: 'exact', head: true});
     	if (countError)
 	{
         	console.error('Error fetching count:', countError);
@@ -416,7 +425,7 @@ signoutButton.addEventListener('click', async()=>
 		if(error)
 			console.error(error.message);
 		else
-			window.location.href="https://Maptivate.earth/index.html";
+			window.location.href="https://shamusduffey.github.io/Maptivate/index.html";
 	}
 });
 });
