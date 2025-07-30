@@ -132,7 +132,7 @@ async function loadLayer(workingIndex)
                 `<div>
                         <h4>${row.sRow.title}</h4>
                         <p>${row.sRow.content}</p>
-			<p style="color: ${pinColor}">By user: <a href="https://shamusduffey.github.io/Maptivate/users"><u>${data.display_name}</u></a></p>
+			<p style="color: ${pinColor}">By user: <a href="https://shamusduffey.github.io/Maptivate/GITusers.html"><u>${data.display_name}</u></a></p>
                 </div>`;
 
 		row.lMarker.addTo(map).bindPopup(popupContent);
