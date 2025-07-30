@@ -4,4 +4,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 let session;
 let USER;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
-
+var map = L.map('map').setView([42.63583, -71.314167], 14);
+L.tileLayer(
+        'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
+        {
+                attribution:
+                        '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a>' +
+                        ' <a href="https://www.openstreetmap.org/copyright" target="_blank">' +
+                        '&copy; OpenStreetMap contributors</a>',
+        }
+).addTo(map);
