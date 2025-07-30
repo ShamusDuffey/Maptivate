@@ -20,6 +20,36 @@ export async function getUser()
 	session=await checkSession();
 	USER=await getUser();
 })();
+export async function loadPin(pin_id, ...credentials)
+{
+        if(credentials.length===0&&typeof pin_id==="number")
+        {
+                const sRow=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
+                const lat=sRow.latitude;
+                const lng=sRow.longitude;
+                const title=sRow.title;
+                const content=sRow.content;
+        }
+        else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
+        {
+                const lat=credentials[0];
+                const lng=credentials[1];
+                const title=credentials[2];
+                const content=credentials[3];
+        }
+        else
+        {
+                console.error("Incorrectly formatted arguments in loadPin function\n");
+                return;
+        }
+        const popupContent=
+                `<div>
+                        <h4>${title}</h4>
+                        <p>${content}</p>
+                </div>`;
+        let pin=L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+        return pin;
+}
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
@@ -115,36 +145,6 @@ async function hideLayer(workingIndex)
 		if(row===null) continue;
 		map.removeLayer(row.lMarker)
 	}
-}
-export async function loadPin(pin_id, ...credentials)
-{
-	if(credentials.length===0&&typeof pin_id==="number")
-	{
-		const sRow=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
-		const lat=sRow.latitude;
-		const lng=sRow.longitude;
-		const title=sRow.title;
-		const content=sRow.content;
-	}
-	else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
-	{
-		const lat=credentials[0];
-		const lng=credentials[1];
-		const title=credentials[2];
-		const content=credentials[3];
-	}
-	else
-	{
-		console.error("Incorrectly formatted arguments in loadPin function\n");
-		return;
-	}
-	const popupContent=
-		`<div>
-			<h4>${title}</h4>
-			<p>${content}</p>
-		</div>`;
-	let pin=L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
-	return pin;
 }
 	
 async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, selectedLayerIndices)
