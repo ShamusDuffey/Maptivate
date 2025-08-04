@@ -139,13 +139,13 @@ async function loadLayer(workingIndex)
 		{
 			localStorage.setItem("selectedUserId", row.sRow.creator_id);
 		});
-		const popupContent=
-                `<div>
-                        <h4>${row.sRow.title}</h4>
-                        <p>${row.sRow.content}</p>
-			<p>${link}</p>
-                </div>`;
-
+		const popupContent=document.createElement("div");
+		const pinTitle=document.createElement("h4");
+		pinTitle.textContent=row.sRow.title;
+		popupContent.appendChild(pinTitle);
+		const pinDescription=document.createElement("p");
+		pinDescription.textContent=row.sRow.content;
+		popupContent.appendChild(pinDescription);
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 } 
