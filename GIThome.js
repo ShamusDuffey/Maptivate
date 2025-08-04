@@ -124,15 +124,26 @@ async function loadLayer(workingIndex)
 			break;
 			default: pinColor="undefined color"; return;
 		}
-		const {data, error}=await sb.from("Users").select("display_name").eq("user_id", row.sRow.creator_id).single();
+		const {data, error}=await sb.from("Users").select("*").eq("user_id", row.sRow.creator_id).single();
 		if(error)
+		{
 			console.error(error.message)
-		
+			return;
+		}
+		const link=document.createElement("a");
+		link.href="https://shamusduffey.github.io/Maptivate/GITusers.html";
+		link.textContent=data.display_name;
+		link.style.textDecoration="underline";
+		link.style.color=pinColor;
+		link.addEventListener("click", ()=>
+		{
+			localStorage.setItem("selectedUserId", row.sRow.creator_id);
+		});
 		const popupContent=
                 `<div>
                         <h4>${row.sRow.title}</h4>
                         <p>${row.sRow.content}</p>
-			<p style="color: ${pinColor}">By user: <a href="https://shamusduffey.github.io/Maptivate/GITusers.html"><u>${data.display_name}</u></a></p>
+			<p>${link}</p>
                 </div>`;
 
 		row.lMarker.addTo(map).bindPopup(popupContent);
