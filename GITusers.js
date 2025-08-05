@@ -4,7 +4,6 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 const userId=localStorage.getItem("selectedUserId");
 let USER=sb.from("Users").select("*").eq("user_id", userId).single();
-const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 var map = L.map('map').setView([42.63583, -71.314167], 14);
 L.tileLayer(
         'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
