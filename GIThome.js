@@ -146,6 +146,10 @@ async function loadLayer(workingIndex)
 		const pinDescription=document.createElement("p");
 		pinDescription.textContent=row.sRow.content;
 		popupContent.appendChild(pinDescription);
+		const userParagraph=document.createElement("p");
+		userParagraph.textContent="By user: ";
+		userParagraph.appendChild(link);
+		popupDiv.appendChild(userParagraph);
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 } 
