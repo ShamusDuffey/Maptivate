@@ -14,7 +14,7 @@ L.tileLayer(
                         '&copy; OpenStreetMap contributors</a>',
         }
 ).addTo(map);
-const {data: usersPins, count: postCount, error: pinsError}=sb.from("Pin Posts").select('*', {count: exact}).eq("creator_id", USER.user_id);
+const {data: usersPins, count: postCount, error: pinsError}=await sb.from("Pin Posts").select('*', {count: "exact"}).eq("creator_id", USER.user_id);
 if(pinsError)
 {
 	console.error(pinsError.message);
