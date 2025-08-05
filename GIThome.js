@@ -149,7 +149,7 @@ async function loadLayer(workingIndex)
 		const userParagraph=document.createElement("p");
 		userParagraph.textContent="By user: ";
 		userParagraph.appendChild(link);
-		popupDiv.appendChild(userParagraph);
+		popupContent.appendChild(userParagraph);
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 } 
