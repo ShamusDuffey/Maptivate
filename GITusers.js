@@ -28,7 +28,7 @@ const {data: LURdata, error: LURerror}=await sb.from("Layers_Users_Relation").se
 if(LURerror)
 {
 	alert(LURerror.message);
-	console.error(LUR.message);
+	console.error(LURerror.message);
 }
 for(let id of LURdata)
 {
