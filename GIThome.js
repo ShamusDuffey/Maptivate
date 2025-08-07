@@ -251,6 +251,7 @@ async function reloadMap()
 	}
 } 
 
+const createNewLayer=document.getElementById("createNewLayer");
 createNewLayer.addEventListener('click', async() =>
 {
 	if(!session){alert("You must be signed in to create layers and pins."); return;}
