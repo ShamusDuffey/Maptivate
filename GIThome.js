@@ -3,13 +3,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 let session;
 let USER;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
-export async function checkSession()
+async function checkSession()
 {
 	const{data, error}=await sb.auth.getSession();
 	if(error) console.error(error.message);
 	else return data.session;
 }
-export async function getUser()
+async function getUser()
 {
 	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();
 	if(error) console.error(error.message);
@@ -20,7 +20,7 @@ export async function getUser()
 	session=await checkSession();
 	USER=await getUser();
 })();
-export async function loadPin(pin_id, ...credentials)
+async function loadPin(pin_id, ...credentials)
 {
         if(credentials.length===0&&typeof pin_id==="number")
         {
