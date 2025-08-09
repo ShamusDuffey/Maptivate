@@ -1,6 +1,9 @@
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
-const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
+window.addEventListener('DOMContentLoaded',()=>{
+(async()=>
+{
+const sb=supabase.createClient(SUPABASE_URL, supabaseKey);
 const userId=localStorage.getItem("selectedUserId");
 let USER=sb.from("Users").select("*").eq("user_id", userId).single();
 var map = L.map('map').setView([42.63583, -71.314167], 14);
@@ -13,9 +16,6 @@ L.tileLayer(
                         '&copy; OpenStreetMap contributors</a>',
         }
 ).addTo(map);
-window.addEventListener('DOMContentLoaded',()=>{
-(async()=>
-{
 const {data: usersPins, count: postCount, error: pinsError}=await sb.from("Pin Posts").select('*', {count: "exact"}).eq("creator_id", USER.user_id);
 if(pinsError)
 {
