@@ -13,6 +13,7 @@ L.tileLayer(
                         '&copy; OpenStreetMap contributors</a>',
         }
 ).addTo(map);
+window.addEventListener('DOMContentLoaded',()=>{
 const {data: usersPins, count: postCount, error: pinsError}=await sb.from("Pin Posts").select('*', {count: "exact"}).eq("creator_id", USER.user_id);
 if(pinsError)
 {
@@ -70,4 +71,4 @@ async function loadPin(pin_id, ...credentials)
         let pin=L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
         return pin;
 }
-
+});
