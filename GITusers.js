@@ -14,6 +14,8 @@ L.tileLayer(
         }
 ).addTo(map);
 window.addEventListener('DOMContentLoaded',()=>{
+(async()=>
+{
 const {data: usersPins, count: postCount, error: pinsError}=await sb.from("Pin Posts").select('*', {count: "exact"}).eq("creator_id", USER.user_id);
 if(pinsError)
 {
@@ -36,11 +38,12 @@ for(let id of LURdata)
 	if(layersError)
 	{
 		console.error(layersError.message);
-		aler(tlayersError.message);
+		alert(layersError.message);
 		break;
 	}
 	activeCommunities.innerHTML+=layersData.name+", ";
 }
+})();
 async function loadPin(pin_id, ...credentials)
 {
         if(credentials.length===0&&typeof pin_id==="number")
