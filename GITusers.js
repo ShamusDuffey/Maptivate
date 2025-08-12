@@ -36,7 +36,7 @@ if(LURerror)
 }
 for(let id of LURdata)
 {
-	const {data: layersData, error: layersError}=await sb.from("Layers").select("name").eq("layer_id", id).single();
+	const {data: layersData, error: layersError}=await sb.from("Layers").select("name").eq("layer_id", id.layer_id).single();
 	if(layersError)
 	{
 		console.error(layersError.message);
