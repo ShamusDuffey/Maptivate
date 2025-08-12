@@ -8,6 +8,7 @@ const userId=localStorage.getItem("selectedUserId");
 const {data: USER, error: userFetchError}=await sb.from("Users").select("*").eq("user_id", userId).single();
 if(userFetchError)
 	console.error(userFetchError.message);
+usernameHeader.textContent=USER.display_name;
 var map = L.map('map').setView([42.63583, -71.314167], 14);
 L.tileLayer(
         'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
