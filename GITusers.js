@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 {
 const sb=supabase.createClient(SUPABASE_URL, supabaseKey);
 const userId=localStorage.getItem("selectedUserId");
-const {data: USER, error: userFetchError}==await sb.from("Users").select("*").eq("user_id", userId).single();
+const {data: USER, error: userFetchError}=await sb.from("Users").select("*").eq("user_id", userId).single();
 if(userFetchError)
 	console.error(userFetchError.message);
 var map = L.map('map').setView([42.63583, -71.314167], 14);
