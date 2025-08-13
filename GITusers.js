@@ -51,33 +51,18 @@ for(let id of LURdata)
 	activeCommunities.innerHTML+=layersData.name+", ";
 }
 })();
-async function loadPin(sb, pin_id, ...credentials)
+async function loadPin(sb, pin_id)
 {
-        if(credentials.length===0&&typeof pin_id==="number")
-        {
-                const {data: sRow, error}=await sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
-		if(error)
-		{
-			console.error(error.message);
-			return;
-		}
-                const lat=sRow.latitude;
-                const lng=sRow.longitude;
-                const title=sRow.title;
-                const content=sRow.content;
-        }
-	else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
-        {
-                const lat=credentials[0];
-                const lng=credentials[1];
-                const title=credentials[2];
-                const content=credentials[3];
-        }
-	else
+	const {data: sRow, error}=await sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
+	if(error)
 	{
-                console.error("Incorrectly formatted arguments in loadPin function\n");
-                return;
-        }
+		console.error(error.message);
+		return;
+	}
+	const lat=sRow.latitude;
+	const lng=sRow.longitude;
+	const title=sRow.title;
+	const content=sRow.content;
 	const popupContent=
                 `<div>
                       	<h4>${title}</h4>
