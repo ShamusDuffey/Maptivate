@@ -30,7 +30,7 @@ else
 	document.getElementById("postNumberParagraph").innerHTML=`Number of posts: ${postCount}`;
 	for(let p of usersPins)
 	{
-		loadPin(p.pin_id);
+		loadPin(sb, p.pin_id);
 	}
 }
 const {data: LURdata, error: LURerror}=await sb.from("Layers_Users_Relation").select("layer_id").eq("user_id", USER.user_id);
@@ -51,7 +51,7 @@ for(let id of LURdata)
 	activeCommunities.innerHTML+=layersData.name+", ";
 }
 })();
-async function loadPin(pin_id, ...credentials)
+async function loadPin(sb, pin_id, ...credentials)
 {
         if(credentials.length===0&&typeof pin_id==="number")
         {
