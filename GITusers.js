@@ -28,6 +28,10 @@ if(pinsError)
 else
 {
 	document.getElementById("postNumberParagraph").innerHTML=`Number of posts: ${postCount}`;
+	for(let p of userPins)
+	{
+		loadPin(p.pin_id);
+	}
 }
 const {data: LURdata, error: LURerror}=await sb.from("Layers_Users_Relation").select("layer_id").eq("user_id", USER.user_id);
 if(LURerror)
