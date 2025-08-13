@@ -28,7 +28,7 @@ if(pinsError)
 else
 {
 	document.getElementById("postNumberParagraph").innerHTML=`Number of posts: ${postCount}`;
-	for(let p of userPins)
+	for(let p of usersPins)
 	{
 		loadPin(p.pin_id);
 	}
