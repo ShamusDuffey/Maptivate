@@ -55,7 +55,12 @@ async function loadPin(sb, pin_id, ...credentials)
 {
         if(credentials.length===0&&typeof pin_id==="number")
         {
-                const sRow=await sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
+                const {data: sRow, error}=await sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
+		if(error)
+		{
+			console.error(error.message);
+			return;
+		}
                 const lat=sRow.latitude;
                 const lng=sRow.longitude;
                 const title=sRow.title;
