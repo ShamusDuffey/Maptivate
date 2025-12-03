@@ -251,7 +251,7 @@ async function reloadMap()
 		if(selected_layer_ids[i]!=null)
 			loadLayer(i);
 	}
-} 
+}
 
 const createNewLayer=document.getElementById("createNewLayer");
 createNewLayer.addEventListener('click', async() =>
@@ -438,6 +438,7 @@ layer4Box.addEventListener('click', async()=>
 if(session)
 {
 	document.getElementById("signInButton").textContent="SIGN OUT";
+}
 signInButton.addEventListener('click', async()=>
 {
 	if(session)
