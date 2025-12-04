@@ -2,8 +2,8 @@ const signInPage = "https://shamusduffey.github.io/Maptivate/GITsignin.html";
 const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const userPage = "https://shamusduffey.github.io/Maptivate/GITusers.html";
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
-let session;
-let USER;
+let session = null;
+let USER = null;;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 async function checkSession()
 {
@@ -451,8 +451,7 @@ signInButton.addEventListener('click', async()=>
 		const {error}=await sb.auth.signOut();
 		if(error)
 			console.error(error.message);
-		else
-			window.location.href=signInPage;
 	}
+	window.location.href=signInPage;
 });
 });
