@@ -442,7 +442,7 @@ layer4Box.addEventListener('click', async()=>
 });
 if(session)
 {
-	document.getElementById("signInButton").textContent="SIGN OUT";
+	document.getElementById("signInButton").value="SIGN OUT";
 }
 signInButton.addEventListener('click', async()=>
 {
