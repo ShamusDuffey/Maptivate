@@ -13,7 +13,12 @@ async function checkSession()
 }
 async function getUser()
 {
-	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();
+	if(!session)
+	{
+		console.error("Session is null in getUser.\n");
+		return null;
+	}
+	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();//𐐧੩Ꞥ 𐐝𐐇𐐟𐐆𐐤 𐐒𐐀þϴ𐐡 𐐝𐐇𐐟𐐆𐐤 𐐆੩ 𐐔𐐆þ𐐌𐐤𐐔
 	if(error) console.error(error.message);
 	else return data;
 }
