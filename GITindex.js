@@ -3,7 +3,7 @@ const SUPABASE_URL = 'https://tckolgmxbedfuytfkudh.supabase.co';
 const userPage = "https://shamusduffey.github.io/Maptivate/GITusers.html";
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRja29sZ214YmVkZnV5dGZrdWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5MjY3MjMsImV4cCI6MjA1MDUwMjcyM30.FEemUUeRDJwT8s98mY2sZa0xwlh72EJQlzO7Kxa2uIA';
 let session = null;
-let USER = null;;
+let USER = null;
 const sb = supabase.createClient(SUPABASE_URL, supabaseKey);
 async function checkSession()
 {
@@ -18,7 +18,7 @@ async function getUser()
 		console.error("Session is null in getUser.\n");
 		return null;
 	}
-	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();//𐐧੩Ꞥ 𐐝𐐇𐐟𐐆𐐤 𐐒𐐀þϴ𐐡 𐐝𐐇𐐟𐐆𐐤 𐐆੩ 𐐔𐐆þ𐐌𐐤𐐔
+	const{data, error}=await sb.from("Users").select("*").eq("email", session.user.email).single();
 	if(error) console.error(error.message);
 	else return data;
 }
@@ -27,36 +27,6 @@ async function getUser()
 	session=await checkSession();
 	USER=await getUser();
 })();
-async function loadPin(pin_id, ...credentials)
-{
-        if(credentials.length===0&&typeof pin_id==="number")
-        {
-                const sRow=sb.from('Pin Posts').select('*').eq('pin_id', pin_id).single();
-                const lat=sRow.latitude;
-                const lng=sRow.longitude;
-                const title=sRow.title;
-                const content=sRow.content;
-        }
-        else if(typeof credentials[0]==="number"&&typeof credentials[1]==="number"&&typeof credentials[2]==="string"&&typeof credentials[3]==="string")
-        {
-                const lat=credentials[0];
-                const lng=credentials[1];
-                const title=credentials[2];
-                const content=credentials[3];
-        }
-        else
-        {
-                console.error("Incorrectly formatted arguments in loadPin function\n");
-                return;
-        }
-        const popupContent=
-                `<div>
-                        <h4>${title}</h4>
-                        <p>${content}</p>
-                </div>`;
-        let pin=L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
-        return pin;
-}
 let working_layer_ids=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
@@ -64,77 +34,73 @@ window.addEventListener('DOMContentLoaded',()=>{
 async function downloadLayer(layer, workingIndex)
 {
 	if(typeof layer==="number")
-        {
-                const {data, error}=await sb.from('Layers_Pins_Relation').select('pin_id').eq("layer_id", layer);
-                const idsOfPins=data.map(relationRow=>relationRow.pin_id);
+	{
+		const {data, error}=await sb.from('Layers_Pins_Relation').select('pin_id, subtype_id').eq("layer_id", layer);
 		downloadedPins[workingIndex]=[];
-                for(const id of idsOfPins)
-                {
-                        const {data: returnedRow, error: returnError}=await sb.from('Pin Posts').select('*').eq("pin_id", id).single();
+		for(const relation of data)
+		{
+			const {data: returnedRow, error: returnError}=await sb.from('Pin Posts').select('*').eq("pin_id", relation.pin_id).single();
 			if(returnError)
 			{
-				console.error("Error fetching pin "+id+":", returnError);
+				console.error("Error fetching pin "+relation.pin_id+":", returnError);
 				continue;
 			}
+			let subtypeIconUrl=null;
+			if(relation.subtype_id)
+			{
+				const {data: subtypeData, error: subtypeError}=await sb.from('Subtypes').select('icon_url').eq('subtype_id', relation.subtype_id).single();
+				if(!subtypeError)
+					subtypeIconUrl=subtypeData.icon_url;
+			}
 			const pin=L.marker([returnedRow.latitude, returnedRow.longitude]);
-			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin});
-			console.log("Downloaded pin "+id+"\n with this sRow content: "+JSON.stringify(returnedRow, null, 4));
-                }
+			downloadedPins[workingIndex].push({sRow: returnedRow, lMarker: pin, subtypeIconUrl: subtypeIconUrl});
+			console.log("Downloaded pin "+relation.pin_id+"\n with this sRow content: "+JSON.stringify(returnedRow, null, 4));
+		}
 		return;
-        }
+	}
 	else
 		console.error("downloadLayer is being called with an inappropriate type.\n");
 }
 async function loadLayer(workingIndex)
 {
+	const pinColor=getPinColor(workingIndex, selected_layer_ids);
+	if(pinColor===null) return;
 	for(const row of downloadedPins[workingIndex])
 	{
 		if(row===null) continue;
-		let pinColor;
-		switch(workingIndex)
+		let iconUrl=row.subtypeIconUrl;
+		for(let j=0; j<workingIndex; j++)
 		{
-			case 0: pinColor="red"; 
-			if(selected_layer_ids[1]&&selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="black";
-			else if(selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="brown";
-			else if(selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="#ffb77d";//light orange
-			else if(selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="#d132d1";//light purple
-			else if(selected_layer_ids[1]) pinColor="purple";
-			else if(selected_layer_ids[2]) pinColor="orange";
-			else if(selected_layer_ids[3]) pinColor="pink";
-			break;
-			case 1: pinColor="blue";
-			if(selected_layer_ids[0]&&selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="black";
-			else if(selected_layer_ids[0]&&selected_layer_ids[2]) pinColor="brown";
-			else if(selected_layer_ids[2]&&selected_layer_ids[3]) pinColor="#96ff96";//light green
-			else if(selected_layer_ids[0]&&selected_layer_ids[3]) pinColor="#d132d1";//light purple
-			else if(selected_layer_ids[0]) pinColor="purple";
-			else if(selected_layer_ids[2]) pinColor="green";
-			else if(selected_layer_ids[3]) pinColor="#8787ff";//light blue
-			break;
-			case 2: pinColor="yellow";
-			if(selected_layer_ids[0]&&selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="black";
-			else if(selected_layer_ids[0]&&selected_layer_ids[1]) pinColor="brown";
-			else if(selected_layer_ids[1]&&selected_layer_ids[3]) pinColor="#96ff96";//light green
-			else if(selected_layer_ids[0]&&selected_layer_ids[3]) pinColor="#ffb77d";//light orange
-			else if(selected_layer_ids[0]) pinColor="orange";
-			else if(selected_layer_ids[1]) pinColor="green";
-			else if(selected_layer_ids[3]) pinColor="#d132d1";//light yellow
-			break;
-			case 3: pinColor="white";
-			if(selected_layer_ids[0]&&selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="black";
-			else if(selected_layer_ids[0]&&selected_layer_ids[1]) pinColor="#d132d1";//light purple
-			else if(selected_layer_ids[1]&&selected_layer_ids[2]) pinColor="#96ff96";//light green
-			else if(selected_layer_ids[0]&&selected_layer_ids[2]) pinColor="#ffb77d";//light orange
-			else if(selected_layer_ids[0]) pinColor="pink";
-			else if(selected_layer_ids[1]) pinColor="#8787ff";//light blue
-			else if(selected_layer_ids[2]) pinColor="#d132d1";//light yellow
-			break;
-			default: pinColor="undefined color"; return;
+			if(selected_layer_ids[j]===null) continue;
+			const higherPin=downloadedPins[j].find(r=>r!==null&&r.sRow.pin_id===row.sRow.pin_id);
+			if(higherPin&&higherPin.subtypeIconUrl)
+			{
+				iconUrl=higherPin.subtypeIconUrl;
+				break;
+			}
+		}
+		if(iconUrl)
+		{
+			row.lMarker.setIcon(L.icon({
+				iconUrl: iconUrl,
+				iconSize: [32, 32],
+				iconAnchor: [16, 32],
+				popupAnchor: [0, -32]
+			}));
+		}
+		else
+		{
+			row.lMarker.setIcon(L.icon({
+				iconUrl: 'pinIcons/'+colorToPinIcon[pinColor],
+				iconSize: [25, 41],
+				iconAnchor: [12, 41],
+				popupAnchor: [1, -34]
+			}));
 		}
 		const {data, error}=await sb.from("Users").select("*").eq("user_id", row.sRow.creator_id).single();
 		if(error)
 		{
-			console.error(error.message)
+			console.error(error.message);
 			return;
 		}
 		const link=document.createElement("a");
@@ -159,26 +125,25 @@ async function loadLayer(workingIndex)
 		popupContent.appendChild(userParagraph);
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
-} 
+}
 async function hideLayer(workingIndex)
 {
 	for(const row of downloadedPins[workingIndex])
 	{
 		if(row===null) continue;
-		map.removeLayer(row.lMarker)
+		map.removeLayer(row.lMarker);
 	}
 }
-	
-async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, selectedLayerIndices)
+async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, selectedLayerIndices, subtypeIds)
 {
-	const { count, error: countError } = await sb.from('Pin Posts').select('*', { count: 'exact', head: true });
-        if (countError)
-        {
-                console.error('Error fetching count:', countError);
-                alert('Error fetching count: ' + countError.message);
-                return;
-        }
-	const {data, error} = await sb.from(`Pin Posts`).insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: USER.user_id }]).select().single();
+	const {count, error: countError}=await sb.from('Pin Posts').select('*', {count: 'exact', head: true});
+	if(countError)
+	{
+		console.error('Error fetching count:', countError);
+		alert('Error fetching count: '+countError.message);
+		return;
+	}
+	const {data, error}=await sb.from('Pin Posts').insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: USER.user_id}]).select().single();
 	if(error)
 	{
 		console.error("There was an issue inserting a pin into the database: "+error.message);
@@ -187,7 +152,8 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, se
 	let sRow=data;
 	for(let index of selectedLayerIndices)
 	{
-		const {data, error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selected_layer_ids[index]}]);
+		const subtypeId=subtypeIds[index]||null;
+		const {error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selected_layer_ids[index], subtype_id: subtypeId}]);
 		if(relationError)
 		{
 			console.error("Error inserting into the relation table for pins and layers\n");
@@ -196,55 +162,57 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, se
 	}
 	for(let i of selectedLayerIndices)
 	{
-		downloadedPins[i].push({sRow: sRow, lMarker: marker});
-		console.log("Pushed row with sRow information:");
-		console.log(sRow);
-		console.log("and marker information:");
-		console.log(marker);
-		console.log("to downloadedPins at index "+i);
+		let subtypeIconUrl=null;
+		if(subtypeIds[i])
+		{
+			const {data: subtypeData, error: subtypeError}=await sb.from('Subtypes').select('icon_url').eq('subtype_id', subtypeIds[i]).single();
+			if(!subtypeError)
+				subtypeIconUrl=subtypeData.icon_url;
+		}
+		downloadedPins[i].push({sRow: sRow, lMarker: marker, subtypeIconUrl: subtypeIconUrl});
+		console.log("Pushed pin to downloadedPins at index "+i);
 	}
 	return count;
-};
+}
 async function getLayerIdOrName(argument)
 {
 	if(typeof argument==="string")
 	{
-		const{data, error}=await sb.from(`Layers`).select("layer_id").eq("name", argument).single();
-		if (error)
+		const{data, error}=await sb.from('Layers').select("layer_id").eq("name", argument).single();
+		if(error)
 		{
-   		 	console.error('Error querying Supabase: ', error);
-			alert('Error fetching id: ' + error.message);
-    			return null;
-  		}
+			console.error('Error querying Supabase: ', error);
+			alert('Error fetching id: '+error.message);
+			return null;
+		}
 		return data.layer_id;
 	}
 	else if(typeof argument==="number")
 	{
-		const{data, error}=await sb.from(`Layers`).select("name").eq("layer_id", argument).single();
+		const{data, error}=await sb.from('Layers').select("name").eq("layer_id", argument).single();
 		if(error)
 		{
 			console.error('Error querying Supabase: ', error);
-			alert('Error fetching name: ' + error.message);
+			alert('Error fetching name: '+error.message);
 			return null;
 		}
-		return data.name;//this line may be causing an error
+		return data.name;
 	}
 	else
 	{
 		console.log("Invalid type in getLayerIdOrName\n");
 		return;
 	}
-};
+}
 async function clearMap()
 {
 	for(const layer of downloadedPins)
 	{
-		if(layer===null)
-			continue;
+		if(layer===null) continue;
 		for(const row of layer)
 		{
-			if(row===null) continue; //might remove this in correspondance with the below comment 6/24 12:35
-			map.removeLayer(row.lMarker);//not sure if every lMarker is being assigned to the row structure 6/24 12:33
+			if(row===null) continue;
+			map.removeLayer(row.lMarker);
 		}
 	}
 }
@@ -257,9 +225,62 @@ async function reloadMap()
 			loadLayer(i);
 	}
 }
-
+async function showSubtypeModal(sliIndices)
+{
+	const selectors=document.getElementById('subtypeSelectors');
+	selectors.innerHTML='';
+	let hasSubtypes=false;
+	for(const i of sliIndices)
+	{
+		const {data: subtypes, error}=await sb.from('Subtypes').select('*').eq('layer_id', selected_layer_ids[i]);
+		if(error||!subtypes||subtypes.length===0) continue;
+		hasSubtypes=true;
+		const layerName=await getLayerIdOrName(selected_layer_ids[i]);
+		const label=document.createElement('p');
+		label.textContent=`Layer ${i+1} (${layerName}):`;
+		selectors.appendChild(label);
+		const select=document.createElement('select');
+		select.id=`subtypeSelect_${i}`;
+		const noneOpt=document.createElement('option');
+		noneOpt.value='';
+		noneOpt.textContent='(none)';
+		select.appendChild(noneOpt);
+		for(const subtype of subtypes)
+		{
+			const opt=document.createElement('option');
+			opt.value=subtype.subtype_id;
+			opt.textContent=subtype.name;
+			select.appendChild(opt);
+		}
+		selectors.appendChild(select);
+	}
+	if(!hasSubtypes)
+		return {};
+	const modal=document.getElementById('pinCreationModal');
+	modal.style.display='block';
+	return new Promise((resolve)=>
+	{
+		document.getElementById('confirmPinBtn').onclick=()=>
+		{
+			modal.style.display='none';
+			const result={};
+			for(const i of sliIndices)
+			{
+				const sel=document.getElementById(`subtypeSelect_${i}`);
+				if(sel&&sel.value)
+					result[i]=parseInt(sel.value);
+			}
+			resolve(result);
+		};
+		document.getElementById('cancelPinBtn').onclick=()=>
+		{
+			modal.style.display='none';
+			resolve(null);
+		};
+	});
+}
 const createNewLayer=document.getElementById("createNewLayer");
-createNewLayer.addEventListener('click', async() =>
+createNewLayer.addEventListener('click', async()=>
 {
 	if(!session){alert("You must be signed in to create layers and pins."); return;}
 	const layerNameInput=document.getElementById('layerNameInput');
@@ -277,25 +298,67 @@ createNewLayer.addEventListener('click', async() =>
 	}
 	if(!layerName) return alert('Name your layer based on what it shows!');
 	const{count, error: countError}=await sb.from('Layers').select('*', {count: 'exact', head: true});
-    	if (countError)
+	if(countError)
 	{
-        	console.error('Error fetching count:', countError);
-        	alert('Error fetching count: ' + countError.message);
-        	return;
-    	}
-	const {data, error} = await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: USER.user_id});
-	if (error)
+		console.error('Error fetching count:', countError);
+		alert('Error fetching count: '+countError.message);
+		return;
+	}
+	const {data, error}=await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: USER.user_id});
+	if(error)
 	{
-        	console.error('Error inserting data:', error);
-        	alert('Error inserting data: ' + error.message);
-      	}
+		console.error('Error inserting data:', error);
+		alert('Error inserting data: '+error.message);
+	}
 	else
 	{
-        	console.log('Data inserted successfully:', data);
-        	alert('Data inserted successfully!');
-      	}
+		console.log('Data inserted successfully:', data);
+		alert('Data inserted successfully!');
+	}
 	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: USER.user_id});
 	if(relationError) console.error(relationError.message);
+});
+document.getElementById('manageSubtypesBtn').addEventListener('click', async()=>
+{
+	if(!session){alert("You must be signed in to manage subtypes."); return;}
+	const container=document.getElementById('subtypeFormContainer');
+	if(container.style.display!=='none')
+	{
+		container.style.display='none';
+		return;
+	}
+	const ownedLayers=await getOwnedLayers();
+	if(ownedLayers.length===0){alert("You don't own any layers yet."); return;}
+	const select=document.getElementById('subtypeLayerSelect');
+	select.innerHTML='';
+	for(const layer of ownedLayers)
+	{
+		const opt=document.createElement('option');
+		opt.value=layer.layer_id;
+		opt.textContent=layer.name;
+		select.appendChild(opt);
+	}
+	container.style.display='block';
+});
+document.getElementById('saveSubtypeBtn').addEventListener('click', async()=>
+{
+	const layerId=parseInt(document.getElementById('subtypeLayerSelect').value);
+	const name=document.getElementById('subtypeNameInput').value.trim();
+	const urlInput=document.getElementById('subtypeIconUrlInput').value.trim();
+	const fileInput=document.getElementById('subtypeIconFileInput');
+	if(!name){alert("Please enter a subtype name."); return;}
+	if(!urlInput&&!fileInput.files[0]){alert("Please provide an icon URL or upload an image."); return;}
+	const iconSource=fileInput.files[0]||urlInput;
+	const success=await createSubtype(layerId, name, iconSource);
+	if(success)
+	{
+		alert("Subtype created successfully!");
+		document.getElementById('subtypeNameInput').value='';
+		document.getElementById('subtypeIconUrlInput').value='';
+		fileInput.value='';
+	}
+	else
+		alert("Failed to create subtype.");
 });
 var map = L.map('map').setView([42.63583, -71.314167], 14);
 L.tileLayer(
@@ -313,33 +376,33 @@ map.on('click', async(e)=>
 	const pin_latitude=e.latlng.lat;
 	const pin_longitude=e.latlng.lng;
 	let title=prompt("Enter the title of your pin: ");
-	let content=prompt("Add a discription for nuanced details (or don't): ");
 	if(!title) return;
-	const new_pin=L.marker([pin_latitude, pin_longitude]);
+	let content=prompt("Add a description for nuanced details (or don't): ");
 	let sliIndices=[];
 	for(let i=0; i<selected_layer_ids.length; i++)
 	{
 		if(selected_layer_ids[i]!=null)
-		sliIndices.push(i);
+			sliIndices.push(i);
 	}
-	console.log("sliIndices: "); console.log(sliIndices);//
+	const subtypeIds=await showSubtypeModal(sliIndices);
+	if(subtypeIds===null) return;
+	const new_pin=L.marker([pin_latitude, pin_longitude]);
 	try
 	{
-        	await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, USER.user_id, sliIndices);
+		await saveNewPin(title, content, pin_latitude, pin_longitude, new_pin, USER.user_id, sliIndices, subtypeIds);
 		alert("Pin saved successfully!");
 		reloadMap();
-    	}
-	catch (error)
+	}
+	catch(error)
 	{
-        	console.error("Failed to save pin:", error);
-        	alert("Failed to save pin: " + error.message);
+		console.error("Failed to save pin:", error);
+		alert("Failed to save pin: "+error.message);
 	}
 });
 searchBar.addEventListener('input', async()=>
 {
 	const {data, error}=await sb.from("Layers").select("name");
 	let allLayerNames=[];
-
 	if(error){console.error(error); return;}
 	else{allLayerNames=data.map(row=>row.name);}
 	let query=searchBar.value.toLowerCase();
@@ -355,16 +418,15 @@ searchBar.addEventListener('input', async()=>
 		{
 			searchBar.placeholder=result;
 			let id=await getLayerIdOrName(result);
-			if(working_layer_ids.includes(id)) {alert("You may not pick the same layer for multiple slots."); return;}
-			if(Number(layerSwapDropdown.value)==0) {document.getElementById("layer1Box").checked=false; hideLayer(0); layer1Box.parentElement.childNodes[1].nodeValue=result;}
-			if(Number(layerSwapDropdown.value)==1) {document.getElementById("layer2Box").checked=false; hideLayer(1); layer2Box.parentElement.childNodes[1].nodeValue=result;}
-			if(Number(layerSwapDropdown.value)==2) {document.getElementById("layer3Box").checked=false; hideLayer(2); layer3Box.parentElement.childNodes[1].nodeValue=result;}
-			if(Number(layerSwapDropdown.value)==3) {document.getElementById("layer4Box").checked=false; hideLayer(3); layer4Box.parentElement.childNodes[1].nodeValue=result;}
+			if(working_layer_ids.includes(id)){alert("You may not pick the same layer for multiple slots."); return;}
+			if(Number(layerSwapDropdown.value)==0){document.getElementById("layer1Box").checked=false; hideLayer(0); layer1Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==1){document.getElementById("layer2Box").checked=false; hideLayer(1); layer2Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==2){document.getElementById("layer3Box").checked=false; hideLayer(2); layer3Box.parentElement.childNodes[1].nodeValue=result;}
+			if(Number(layerSwapDropdown.value)==3){document.getElementById("layer4Box").checked=false; hideLayer(3); layer4Box.parentElement.childNodes[1].nodeValue=result;}
 			working_layer_ids[Number(layerSwapDropdown.value)]=id;
 			await downloadLayer(id, Number(layerSwapDropdown.value));
 		});
 	}
-		
 });
 layer1Box.addEventListener('click', async()=>
 {
@@ -375,69 +437,51 @@ layer1Box.addEventListener('click', async()=>
 		return;
 	}
 	else if(selected_layer_ids.includes(working_layer_ids[0]))
-	{
 		selected_layer_ids[0]=null;
-	}
 	else
-	{
 		selected_layer_ids[0]=working_layer_ids[0];
-	}
 	reloadMap();
 });
 layer2Box.addEventListener('click', async()=>
 {
 	if(working_layer_ids[1]===null)
-        {
-                alert("Search for a layer first.");
-                document.getElementById("layer2Box").checked=false;
-                return;
-        }
-
+	{
+		alert("Search for a layer first.");
+		document.getElementById("layer2Box").checked=false;
+		return;
+	}
 	if(selected_layer_ids.includes(working_layer_ids[1]))
-	{
 		selected_layer_ids[1]=null;
-	}
 	else
-	{
-        	selected_layer_ids[1]=working_layer_ids[1];
-	}
+		selected_layer_ids[1]=working_layer_ids[1];
 	reloadMap();
 });
 layer3Box.addEventListener('click', async()=>
 {
 	if(working_layer_ids[2]===null)
-        {
-                alert("Search for a layer first.");
-                document.getElementById("layer3Box").checked=false;
-                return;
-        }
-
+	{
+		alert("Search for a layer first.");
+		document.getElementById("layer3Box").checked=false;
+		return;
+	}
 	if(selected_layer_ids.includes(working_layer_ids[2]))
-	{
 		selected_layer_ids[2]=null;
-	}
-        else
-	{
+	else
 		selected_layer_ids[2]=working_layer_ids[2];
-	}
 	reloadMap();
 });
 layer4Box.addEventListener('click', async()=>
 {
 	if(working_layer_ids[3]===null)
-        {
-                alert("Search for a layer first.");
-                document.getElementById("layer4Box").checked=false;
-                return;
-        }
+	{
+		alert("Search for a layer first.");
+		document.getElementById("layer4Box").checked=false;
+		return;
+	}
 	if(selected_layer_ids.includes(working_layer_ids[3]))
-	{
 		selected_layer_ids[3]=null;
-	}
 	else
-	{
 		selected_layer_ids[3]=working_layer_ids[3];
-	}
 	reloadMap();
 });
 if(session)

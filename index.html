@@ -13,7 +13,6 @@
     crossorigin=""
   ></script>
   <style>
-    /* remove the extra semicolon after the closing brace */
     #map {
       float: left;
       position: relative;
@@ -22,6 +21,18 @@
       right: 5vw;
       width: 55vw;
       height: 80vh;
+    }
+    #pinCreationModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid black;
+      border-radius: 8px;
+      z-index: 9999;
     }
   </style>
 </head>
@@ -33,7 +44,7 @@
         <input type="text" id="layerNameInput" placeholder="Name the layer based on what it shows.">
       </li>
       <li>
-        Which layer slot are you swaping?
+        Which layer slot are you swapping?
       </li>
       <li>
         <select id="layerSwapDropdown">
@@ -44,7 +55,7 @@
         </select>
       </li>
       <li>
-	<input type="button" value="SEARCH" id="searchButton">
+        <input type="button" value="SEARCH" id="searchButton">
         <input type="search" placeholder="What data do you want to see mapped?" id="searchBar">
       </li>
       <li>
@@ -55,15 +66,31 @@
       <li><label><input type="checkbox" id="layer2Box">LAYER 2</label></li>
       <li><label><input type="checkbox" id="layer3Box">LAYER 3</label></li>
       <li><label><input type="checkbox" id="layer4Box">LAYER 4</label></li>
-    
-    <li>
-      <input type="button" id="signInButton" value="SIGN IN">
-    </li>
+      <li>
+        <input type="button" id="manageSubtypesBtn" value="Manage Subtypes">
+      </li>
+      <li id="subtypeFormContainer" style="display:none;">
+        <select id="subtypeLayerSelect"></select><br>
+        <input type="text" id="subtypeNameInput" placeholder="Subtype name (e.g. swings)"><br>
+        <input type="text" id="subtypeIconUrlInput" placeholder="Icon URL (optional)"><br>
+        <input type="file" id="subtypeIconFileInput" accept="image/*"><br>
+        <input type="button" id="saveSubtypeBtn" value="Save Subtype">
+      </li>
+      <li>
+        <input type="button" id="signInButton" value="SIGN IN">
+      </li>
     </ul>
   </div>
   <div id="map" style="border-radius: 32px; border: 4px solid yellow;"></div>
+  <div id="pinCreationModal">
+    <h3>Tag your pin</h3>
+    <div id="subtypeSelectors"></div>
+    <input type="button" id="confirmPinBtn" value="Place Pin">
+    <input type="button" id="cancelPinBtn" value="Cancel">
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="GITpinColor.js" defer></script>
+  <script src="GITsubtypes.js" defer></script>
   <script src="GITindex.js" defer></script>
 </body>
 </html>
-
