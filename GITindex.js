@@ -143,14 +143,7 @@ async function hideLayer(workingIndex)
 }
 async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, selectedLayerIndices, subtypeIds)
 {
-	const {count, error: countError}=await sb.from('Pin Posts').select('*', {count: 'exact', head: true});
-	if(countError)
-	{
-		console.error('Error fetching count:', countError);
-		alert('Error fetching count: '+countError.message);
-		return;
-	}
-	const {data, error}=await sb.from('Pin Posts').insert([{pin_id: count, title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: USER.user_id}]).select().single();
+	const {data, error}=await sb.from('Pin Posts').insert([{title: newTitle, content: newContent, longitude: lng, latitude: lat, creator_id: USER.user_id}]).select().single();
 	if(error)
 	{
 		console.error("There was an issue inserting a pin into the database: "+error.message);
@@ -160,7 +153,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, se
 	for(let index of selectedLayerIndices)
 	{
 		const subtypeId=subtypeIds[index]||null;
-		const {error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: count, layer_id: selected_layer_ids[index], subtype_id: subtypeId}]);
+		const {error: relationError}=await sb.from('Layers_Pins_Relation').insert([{pin_id: sRow.pin_id, layer_id: selected_layer_ids[index], subtype_id: subtypeId}]);
 		if(relationError)
 		{
 			console.error("Error inserting into the relation table for pins and layers\n");
@@ -304,25 +297,19 @@ createNewLayer.addEventListener('click', async()=>
 		return;
 	}
 	if(!layerName) return alert('Name your layer based on what it shows!');
-	const{count, error: countError}=await sb.from('Layers').select('*', {count: 'exact', head: true});
-	if(countError)
-	{
-		console.error('Error fetching count:', countError);
-		alert('Error fetching count: '+countError.message);
-		return;
-	}
-	const {data, error}=await sb.from('Layers').insert({layer_id: count, name: layerName, owner_id: USER.user_id});
+	const {data, error}=await sb.from('Layers').insert({name: layerName, owner_id: USER.user_id}).select().single();
 	if(error)
 	{
 		console.error('Error inserting data:', error);
 		alert('Error inserting data: '+error.message);
+		return;
 	}
 	else
 	{
 		console.log('Data inserted successfully:', data);
 		alert('Data inserted successfully!');
 	}
-	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: count, user_id: USER.user_id});
+	const {error: relationError}=await sb.from("Layers_Users_Relation").insert({layer_id: data.layer_id, user_id: USER.user_id});
 	if(relationError) console.error(relationError.message);
 });
 document.getElementById('manageSubtypesBtn').addEventListener('click', async()=>
