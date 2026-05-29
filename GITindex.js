@@ -172,7 +172,7 @@ async function saveNewPin(newTitle, newContent, lat, lng, marker, creator_id, se
 		downloadedPins[i].push({sRow: sRow, lMarker: marker, subtypeIconUrl: subtypeIconUrl});
 		console.log("Pushed pin to downloadedPins at index "+i);
 	}
-	return count;
+	return sRow.pin_id;
 }
 async function getLayerIdOrName(argument)
 {
