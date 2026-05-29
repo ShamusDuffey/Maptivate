@@ -263,40 +263,42 @@ function openPinDetailModal(sRow, displayName, iconUrl, pinColor)
 	}));
 	document.getElementById('pinDetailModal').style.display='block';
 	if(detailMap) { detailMap.remove(); detailMap=null; }
-	setTimeout(()=>
+	requestAnimationFrame(()=>
 	{
-		detailMap=L.map('detailMap').setView([sRow.latitude, sRow.longitude], 15);
-		detailMap.invalidateSize();
-		L.tileLayer(
-			'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
+		requestAnimationFrame(()=>
+		{
+			detailMap=L.map('detailMap').setView([sRow.latitude, sRow.longitude], 15);
+			L.tileLayer(
+				'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
+				{
+					attribution:
+						'<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a>' +
+						' <a href="https://www.openstreetmap.org/copyright" target="_blank">' +
+						'&copy; OpenStreetMap contributors</a>',
+				}
+			).addTo(detailMap);
+			let markerIcon;
+			if(iconUrl)
 			{
-				attribution:
-					'<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a>' +
-					' <a href="https://www.openstreetmap.org/copyright" target="_blank">' +
-					'&copy; OpenStreetMap contributors</a>',
+				markerIcon=L.icon({
+					iconUrl: iconUrl,
+					iconSize: [32, 32],
+					iconAnchor: [16, 32],
+					popupAnchor: [0, -32]
+				});
 			}
-		).addTo(detailMap);
-		let markerIcon;
-		if(iconUrl)
-		{
-			markerIcon=L.icon({
-				iconUrl: iconUrl,
-				iconSize: [32, 32],
-				iconAnchor: [16, 32],
-				popupAnchor: [0, -32]
-			});
-		}
-		else
-		{
-			markerIcon=L.icon({
-				iconUrl: 'pinIcons/'+colorToPinIcon[pinColor],
-				iconSize: [25, 41],
-				iconAnchor: [12, 41],
-				popupAnchor: [1, -34]
-			});
-		}
-		L.marker([sRow.latitude, sRow.longitude], {icon: markerIcon}).addTo(detailMap);
-	}, 100);
+			else
+			{
+				markerIcon=L.icon({
+					iconUrl: 'pinIcons/'+colorToPinIcon[pinColor],
+					iconSize: [25, 41],
+					iconAnchor: [12, 41],
+					popupAnchor: [1, -34]
+				});
+			}
+			L.marker([sRow.latitude, sRow.longitude], {icon: markerIcon}).addTo(detailMap);
+		});
+	});
 }
 document.getElementById('closePinDetailBtn').addEventListener('click', ()=>
 {
