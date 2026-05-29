@@ -5,7 +5,8 @@ async function createSubtype(layerId, name, iconSource)
 		iconUrl=iconSource;
 	else
 	{
-		const fileName=`${layerId}_${Date.now()}_${iconSource.name}`;
+		const safeName=iconSource.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+		const fileName=`${layerId}_${Date.now()}_${safeName}`;
 		const {error: uploadError}=await sb.storage.from('subtype-icons').upload(fileName, iconSource, {upsert: true});
 		if(uploadError)
 		{
