@@ -367,6 +367,13 @@ document.getElementById('saveSubtypeBtn').addEventListener('click', async()=>
 	else
 		alert("Failed to create subtype.");
 });
+document.addEventListener('keydown', (e)=>
+{
+	if(e.key==='1') layer1Box.click();
+	else if(e.key==='2') layer2Box.click();
+	else if(e.key==='3') layer3Box.click();
+	else if(e.key==='4') layer4Box.click();
+});
 var map = L.map('map').setView([42.63583, -71.314167], 14);
 L.tileLayer(
 	'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
