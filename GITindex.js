@@ -266,6 +266,7 @@ function openPinDetailModal(sRow, displayName, iconUrl, pinColor)
 	setTimeout(()=>
 	{
 		detailMap=L.map('detailMap').setView([sRow.latitude, sRow.longitude], 15);
+		detailMap.invalidateSize();
 		L.tileLayer(
 			'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=a5ic5yAL7H7RtI0ALklW',
 			{
@@ -295,7 +296,7 @@ function openPinDetailModal(sRow, displayName, iconUrl, pinColor)
 			});
 		}
 		L.marker([sRow.latitude, sRow.longitude], {icon: markerIcon}).addTo(detailMap);
-	}, 0);
+	}, 100);
 }
 document.getElementById('closePinDetailBtn').addEventListener('click', ()=>
 {
