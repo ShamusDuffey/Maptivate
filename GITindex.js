@@ -63,11 +63,18 @@ async function downloadLayer(layer, workingIndex)
 }
 async function loadLayer(workingIndex)
 {
-	const pinColor=getPinColor(workingIndex, selected_layer_ids);
-	if(pinColor===null) return;
 	for(const row of downloadedPins[workingIndex])
 	{
 		if(row===null) continue;
+		const pinLayerIds=[null, null, null, null];
+		for(let j=0; j<4; j++)
+		{
+			if(selected_layer_ids[j]===null) continue;
+			const inSlot=downloadedPins[j].find(r=>r!==null&&r.sRow.pin_id===row.sRow.pin_id);
+			if(inSlot) pinLayerIds[j]=selected_layer_ids[j];
+		}
+		const pinColor=getPinColor(workingIndex, pinLayerIds);
+		if(pinColor===null) return;
 		let iconUrl=row.subtypeIconUrl;
 		for(let j=0; j<workingIndex; j++)
 		{
