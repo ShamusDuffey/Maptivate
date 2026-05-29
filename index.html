@@ -82,6 +82,13 @@
     </ul>
   </div>
   <div id="map" style="border-radius: 32px; border: 4px solid yellow;"></div>
+  <div id="pinDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; overflow-y:auto; padding:20px; box-sizing:border-box;">
+    <input type="button" id="closePinDetailBtn" value="Close">
+    <h2 id="detailPinTitle"></h2>
+    <p id="detailPinContent"></p>
+    <p id="detailPinCreator"></p>
+    <div id="detailVoteWidget"></div>
+  </div>
   <div id="pinCreationModal">
     <h3>Tag your pin</h3>
     <div id="subtypeSelectors"></div>
@@ -91,6 +98,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="GITpinColor.js" defer></script>
   <script src="GITsubtypes.js" defer></script>
+  <script src="GITvoting.js" defer></script>
   <script src="GITindex.js" defer></script>
 </body>
 </html>

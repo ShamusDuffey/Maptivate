@@ -63,9 +63,19 @@ async function downloadLayer(layer, workingIndex)
 }
 async function loadLayer(workingIndex)
 {
-	for(const row of downloadedPins[workingIndex])
+	const zoom=map.getZoom();
+	let maxPins;
+	if(zoom>=14) maxPins=Infinity;
+	else if(zoom>=12) maxPins=150;
+	else if(zoom>=10) maxPins=75;
+	else if(zoom>=8) maxPins=30;
+	else maxPins=10;
+	const sortedPins=downloadedPins[workingIndex]
+		.filter(r=>r!==null)
+		.sort((a,b)=>(b.sRow.score??0)-(a.sRow.score??0));
+	const pinsToShow=maxPins===Infinity?sortedPins:sortedPins.slice(0, maxPins);
+	for(const row of pinsToShow)
 	{
-		if(row===null) continue;
 		const pinLayerIds=[null, null, null, null];
 		for(let j=0; j<4; j++)
 		{
@@ -74,7 +84,7 @@ async function loadLayer(workingIndex)
 			if(inSlot) pinLayerIds[j]=selected_layer_ids[j];
 		}
 		const pinColor=getPinColor(workingIndex, pinLayerIds);
-		if(pinColor===null) return;
+		if(pinColor===null) continue;
 		let iconUrl=row.subtypeIconUrl;
 		for(let j=0; j<workingIndex; j++)
 		{
@@ -108,7 +118,7 @@ async function loadLayer(workingIndex)
 		if(error)
 		{
 			console.error(error.message);
-			return;
+			continue;
 		}
 		const link=document.createElement("a");
 		link.href=userPage;
@@ -130,6 +140,20 @@ async function loadLayer(workingIndex)
 		userParagraph.textContent="By user: ";
 		userParagraph.appendChild(link);
 		popupContent.appendChild(userParagraph);
+		const voteWidget=buildVoteWidget('pin', row.sRow.pin_id, row.sRow.score??0, row.sRow.creator_id, (newScore)=>
+		{
+			row.sRow.score=newScore;
+		});
+		popupContent.appendChild(voteWidget);
+		const detailBtn=document.createElement('button');
+		detailBtn.textContent='View Details';
+		detailBtn.style.cssText='margin-top:6px; cursor:pointer; display:block;';
+		detailBtn.addEventListener('click', (e)=>
+		{
+			e.stopPropagation();
+			openPinDetailModal(row.sRow, data.display_name);
+		});
+		popupContent.appendChild(detailBtn);
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 }
@@ -225,6 +249,23 @@ async function reloadMap()
 			loadLayer(i);
 	}
 }
+function openPinDetailModal(sRow, displayName)
+{
+	document.getElementById('detailPinTitle').textContent=sRow.title;
+	document.getElementById('detailPinContent').textContent=sRow.content;
+	document.getElementById('detailPinCreator').textContent='By: '+displayName;
+	const widgetContainer=document.getElementById('detailVoteWidget');
+	widgetContainer.innerHTML='';
+	widgetContainer.appendChild(buildVoteWidget('pin', sRow.pin_id, sRow.score??0, sRow.creator_id, (newScore)=>
+	{
+		sRow.score=newScore;
+	}));
+	document.getElementById('pinDetailModal').style.display='block';
+}
+document.getElementById('closePinDetailBtn').addEventListener('click', ()=>
+{
+	document.getElementById('pinDetailModal').style.display='none';
+});
 async function showSubtypeModal(sliIndices)
 {
 	const selectors=document.getElementById('subtypeSelectors');
@@ -371,6 +412,10 @@ L.tileLayer(
 			'&copy; OpenStreetMap contributors</a>',
 	}
 ).addTo(map);
+map.on('zoomend', ()=>
+{
+	reloadMap();
+});
 map.on('click', async(e)=>
 {
 	if(!session){alert("You must be signed in to create layers and pins."); return;}
