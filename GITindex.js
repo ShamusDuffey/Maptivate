@@ -28,6 +28,7 @@ async function getUser()
 	USER=await getUser();
 })();
 let working_layer_ids=[null, null, null, null];
+let working_layer_owners=[null, null, null, null];
 let selected_layer_ids=[null, null, null, null];
 let downloadedPins=[[null], [null], [null], [null]];
 window.addEventListener('DOMContentLoaded',()=>{
@@ -35,6 +36,8 @@ async function downloadLayer(layer, workingIndex)
 {
 	if(typeof layer==="number")
 	{
+		const {data: layerInfo, error: layerInfoError}=await sb.from('Layers').select('owner_id').eq('layer_id', layer).single();
+		if(!layerInfoError) working_layer_owners[workingIndex]=layerInfo.owner_id;
 		const {data, error}=await sb.from('Layers_Pins_Relation').select('pin_id, subtype_id').eq("layer_id", layer);
 		downloadedPins[workingIndex]=[];
 		for(const relation of data)
@@ -145,15 +148,28 @@ async function loadLayer(workingIndex)
 			row.sRow.score=newScore;
 		});
 		popupContent.appendChild(voteWidget);
+		const canDelete=USER&&(USER.user_id===row.sRow.creator_id||USER.user_id===working_layer_owners[workingIndex]);
 		const detailBtn=document.createElement('button');
 		detailBtn.textContent='View Details';
 		detailBtn.style.cssText='margin-top:6px; cursor:pointer; display:block;';
 		detailBtn.addEventListener('click', (e)=>
 		{
 			e.stopPropagation();
-			openPinDetailModal(row.sRow, data.display_name, iconUrl, pinColor);
+			openPinDetailModal(row.sRow, data.display_name, iconUrl, pinColor, row.lMarker, canDelete);
 		});
 		popupContent.appendChild(detailBtn);
+		if(canDelete)
+		{
+			const deletePinBtn=document.createElement('button');
+			deletePinBtn.textContent='Delete Pin';
+			deletePinBtn.style.cssText='margin-top:4px; cursor:pointer; display:block; color:red;';
+			deletePinBtn.addEventListener('click', async(e)=>
+			{
+				e.stopPropagation();
+				await deletePin(row.sRow.pin_id, row.lMarker);
+			});
+			popupContent.appendChild(deletePinBtn);
+		}
 		row.lMarker.addTo(map).bindPopup(popupContent);
 	}
 }
@@ -250,11 +266,39 @@ async function reloadMap()
 	}
 }
 let detailMap=null;
-function openPinDetailModal(sRow, displayName, iconUrl, pinColor)
+async function deletePin(pinId, marker)
+{
+	if(!confirm('Delete this pin permanently?')) return;
+	const {error: relError}=await sb.from('Layers_Pins_Relation').delete().eq('pin_id', pinId);
+	if(relError) { console.error(relError.message); alert('Failed to delete pin.'); return; }
+	const {error: votesError}=await sb.from('Votes').delete().eq('target_id', pinId).eq('target_type', 'pin');
+	if(votesError) console.error(votesError.message);
+	const {error: pinError}=await sb.from('Pin Posts').delete().eq('pin_id', pinId);
+	if(pinError) { console.error(pinError.message); alert('Failed to delete pin.'); return; }
+	map.removeLayer(marker);
+	map.closePopup();
+	for(let i=0; i<downloadedPins.length; i++)
+		downloadedPins[i]=downloadedPins[i].filter(r=>r===null||r.sRow.pin_id!==pinId);
+	document.getElementById('pinDetailModal').style.display='none';
+}
+function openPinDetailModal(sRow, displayName, iconUrl, pinColor, marker, canDelete)
 {
 	document.getElementById('detailPinTitle').textContent=sRow.title;
 	document.getElementById('detailPinContent').textContent=sRow.content;
 	document.getElementById('detailPinCreator').textContent='By: '+displayName;
+	const deleteContainer=document.getElementById('detailDeleteContainer');
+	deleteContainer.innerHTML='';
+	if(canDelete)
+	{
+		const deletePinBtn=document.createElement('button');
+		deletePinBtn.textContent='Delete Pin';
+		deletePinBtn.style.cssText='margin-top:8px; cursor:pointer; color:red;';
+		deletePinBtn.addEventListener('click', async()=>
+		{
+			await deletePin(sRow.pin_id, marker);
+		});
+		deleteContainer.appendChild(deletePinBtn);
+	}
 	const widgetContainer=document.getElementById('detailVoteWidget');
 	widgetContainer.innerHTML='';
 	widgetContainer.appendChild(buildVoteWidget('pin', sRow.pin_id, sRow.score??0, sRow.creator_id, (newScore)=>
@@ -412,6 +456,11 @@ document.getElementById('manageSubtypesBtn').addEventListener('click', async()=>
 		select.appendChild(opt);
 	}
 	container.style.display='block';
+	await loadSubtypeList(parseInt(select.value));
+});
+document.getElementById('subtypeLayerSelect').addEventListener('change', async()=>
+{
+	await loadSubtypeList(parseInt(document.getElementById('subtypeLayerSelect').value));
 });
 document.getElementById('saveSubtypeBtn').addEventListener('click', async()=>
 {

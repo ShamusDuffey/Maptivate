@@ -24,6 +24,47 @@ async function createSubtype(layerId, name, iconSource)
 	}
 	return true;
 }
+async function deleteSubtype(subtypeId)
+{
+	const {error: relError}=await sb.from('Layers_Pins_Relation').update({subtype_id: null}).eq('subtype_id', subtypeId);
+	if(relError) { console.error(relError.message); return false; }
+	const {error}=await sb.from('Subtypes').delete().eq('subtype_id', subtypeId);
+	if(error) { console.error(error.message); return false; }
+	return true;
+}
+async function loadSubtypeList(layerId)
+{
+	const list=document.getElementById('subtypeList');
+	list.innerHTML='';
+	const {data: subtypes, error}=await sb.from('Subtypes').select('*').eq('layer_id', layerId);
+	if(error||!subtypes||subtypes.length===0)
+	{
+		list.textContent='No subtypes yet.';
+		return;
+	}
+	for(const subtype of subtypes)
+	{
+		const row=document.createElement('div');
+		row.style.cssText='display:flex; align-items:center; gap:8px; margin-top:4px;';
+		const nameSpan=document.createElement('span');
+		nameSpan.textContent=subtype.name;
+		const deleteBtn=document.createElement('button');
+		deleteBtn.textContent='Delete';
+		deleteBtn.style.cssText='cursor:pointer; color:red;';
+		deleteBtn.addEventListener('click', async()=>
+		{
+			if(!confirm(`Delete subtype "${subtype.name}"?`)) return;
+			const success=await deleteSubtype(subtype.subtype_id);
+			if(success)
+				row.remove();
+			else
+				alert('Failed to delete subtype.');
+		});
+		row.appendChild(nameSpan);
+		row.appendChild(deleteBtn);
+		list.appendChild(row);
+	}
+}
 async function getOwnedLayers()
 {
 	if(!USER) return [];
