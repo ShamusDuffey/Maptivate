@@ -27,6 +27,26 @@
       width: 55vw;
       height: 80vh;
     }
+    input#layer1Box, input#layer2Box, input#layer3Box, input#layer4Box {
+      display: none;
+    }
+    label:has(#layer1Box), label:has(#layer2Box), label:has(#layer3Box), label:has(#layer4Box) {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      filter: brightness(0.5);
+      transition: filter 0.2s;
+      user-select: none;
+    }
+    label:has(input:checked) {
+      filter: brightness(1);
+    }
+    label:has(#layer1Box) { background: red; color: white; }
+    label:has(#layer2Box) { background: #2255ff; color: white; }
+    label:has(#layer3Box) { background: yellow; color: #333; }
+    label:has(#layer4Box) { background: white; color: #333; border: 2px solid #bbb; }
     #pinCreationModal {
       display: none;
       position: fixed;
