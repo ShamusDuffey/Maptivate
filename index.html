@@ -37,7 +37,10 @@
       transition: opacity 0.2s;
       user-select: none;
     }
-    label:has(input:checked) {
+    label:has(#layer1Box:checked),
+    label:has(#layer2Box:checked),
+    label:has(#layer3Box:checked),
+    label:has(#layer4Box:checked) {
       opacity: 1;
     }
     label:has(#layer1Box) { background: #ff0000; color: black; }
