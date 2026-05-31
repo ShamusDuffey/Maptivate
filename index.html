@@ -28,12 +28,13 @@
       height: 80vh;
     }
     input[type="checkbox"] { accent-color: purple; }
-    input[type="text"], input[type="search"] {
-      border: 2px solid #00aa00;
+    li:has(input[type="text"]):not(#subtypeFormContainer),
+    li:has(input[type="search"]) {
+      background: rgba(0, 170, 0, 0.15);
+      border: 2px solid #00cc00;
       border-radius: 10px;
-      padding: 6px 12px;
-      background: rgba(0, 170, 0, 0.1);
-      outline-color: #00aa00;
+      padding: 8px 12px;
+      list-style: none;
     }
     label:has(#layer1Box), label:has(#layer2Box), label:has(#layer3Box), label:has(#layer4Box) {
       display: inline-block;
