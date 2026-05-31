@@ -30,11 +30,13 @@
     input[type="checkbox"] { accent-color: purple; }
     li:has(input[type="text"]):not(#subtypeFormContainer),
     li:has(input[type="search"]) {
-      background: rgba(0, 170, 0, 0.15);
-      border: 2px solid #00cc00;
+      background: #00aa00;
       border-radius: 10px;
       padding: 8px 12px;
       list-style: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     label:has(#layer1Box), label:has(#layer2Box), label:has(#layer3Box), label:has(#layer4Box) {
       display: inline-block;
