@@ -42,10 +42,10 @@ async function signUp(email, password, phone, displayName)
 		alert("There's already an account with this display name; no additional accounts were made.");
 		return 0;
 	}
-	const {data: emailData, error: emailError}=await sb.auth.signUp({email: email, password: password, options: {data: {phone: phone}}});
+	const {data: emailData, error: emailError}=await sb.auth.signUp({email: email, password: password, options: {data: {phone: phone, display_name: displayName}}});
 	if (emailError)
 	{
-		alert("There was an issue signing you up with your email: " + error.message);
+		alert("There was an issue signing you up with your email: " + emailError.message);
 		return 0;
 	}
 	/*const {data: phoneData, error: phoneError}=await sb.auth.signUp({phone: phone, password: password});
@@ -57,13 +57,7 @@ async function signUp(email, password, phone, displayName)
 			console.error("An account has been made but an unfixed error occurred. The account must be manually deleted. Here's the error: "+error.message);
 		return 0;
 	}*/
-	const {error: userTableFillError}=await sb.from("Users").insert({user_id: emailData.user.id, email: email, password: password, phone_number: phone, display_name: displayName});
-	if(userTableFillError)
-	{
-		console.error("The phone number could not be updated. Here's why: "+userTableFillError.message);
-		return;
-	}
-       	alert("Welcome! You've been signed up! Just confirm your identity via email and text to gain access to your account.");
+	alert("Welcome! You've been signed up! Just confirm your identity via email and text to gain access to your account.");
 	return 1;
 }
 async function signin(email, password)
